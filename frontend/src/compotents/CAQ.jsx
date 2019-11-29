@@ -3,14 +3,19 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 class caq extends Component {
-  createQueu = () => {};
+  createQueu = async () => {
+    let response = await fetch("/create-a-queu", {
+      method: "POST",
+      cors: "no-cors"
+    });
+
+    let body = await response.text();
+  };
   render() {
     return (
       <section>
         create a queu
-        <form onSubmit={this.createQueu}>
-          <button>Create my Queu</button>
-        </form>
+        <form onSubmit={this.createQueu}></form>
       </section>
     );
   }
