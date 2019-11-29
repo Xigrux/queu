@@ -16,6 +16,9 @@ class landing extends Component {
       body: data
     });
 
+    let resBody = await response.text();
+    console.log(resBody);
+
     this.props.dispatch({
       type: "login",
       authStatus: { type: "PT", isLoggedIn: true }

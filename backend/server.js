@@ -12,11 +12,11 @@ let app = express();
 
 let upload = multer();
 
-app.use(cors());
+app.use(cors({ origin: "http://localhost:3000" }));
 
 let dbo;
 let url =
-  "mongodb+srv://lulul:123@cluster0-jjd2c.mongodb.net/test?retryWrites=true&w=majority";
+  "mongodb+srv://lulu:123@cluster0-jjd2c.mongodb.net/test?retryWrites=true&w=majority";
 app.use("/", express.static("build"));
 
 MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
@@ -30,7 +30,7 @@ admin.initializeApp({
 
 //=============================== ENDPOINTS ===============================//
 
-app.post("/register", (req, res) => {
+app.post("/register", upload.none(), (req, res) => {
   console.log("in register");
   console.log(req.body);
   let email = req.body.email;
