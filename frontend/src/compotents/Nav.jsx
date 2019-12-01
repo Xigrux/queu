@@ -12,10 +12,10 @@ class nav extends Component {
       <nav>
         {!this.props.isLoggedIn && (
           <span>
-            <Link to="/create-a-queu">
+            <Link to="/event/create-a-queu">
               <button>Create a Queu for my event</button>
             </Link>
-            <Link to="/signin">
+            <Link to="/user/signin">
               <button>Sign In</button>
             </Link>
           </span>

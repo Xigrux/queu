@@ -3,19 +3,80 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 class caq extends Component {
-  createQueu = async () => {
+  constructor(props) {
+    super(props);
+    this.state = {
+      event: undefined,
+      email: undefined,
+      password: undefined
+    };
+  }
+
+  createQueu = async e => {
+    e.preventDefault();
+    console.log("here");
+
+    let data = new FormData();
+    data.append("event", this.state.event);
+    data.append("email", this.state.email);
+    data.append("password", this.state.password);
+
     let response = await fetch("/create-a-queu", {
       method: "POST",
-      cors: "no-cors"
+      body: data
+      // cors: "no-cors"
     });
 
-    let body = await response.text();
+    let resBody = await response.text();
+    console.log(resBody);
+
+    this.props.dispatch({
+      type: "login",
+      authStatus: { type: "PT", isLoggedIn: true }
+    });
   };
+  handleEvent = e => {
+    e.preventDefault();
+    this.setState({ event: e.target.value });
+    console.log(this.state);
+  };
+
+  handleEmail = e => {
+    e.preventDefault();
+    this.setState({ email: e.target.value });
+    console.log(this.state);
+  };
+
+  handlePassword = e => {
+    e.preventDefault();
+    this.setState({ password: e.target.value });
+    console.log(this.state);
+  };
+
   render() {
     return (
       <section>
-        create a queu
-        <form onSubmit={this.createQueu}></form>
+        <form onSubmit={this.createQueu}>
+          <input
+            onChange={this.handleEvent}
+            type="text"
+            name="event"
+            placeholder="event"
+          ></input>
+          <input
+            onChange={this.handleEmail}
+            type="text"
+            name="email"
+            placeholder="email"
+          ></input>
+          <input
+            onChange={this.handlePassword}
+            type="text"
+            name="password"
+            placeholder="password"
+          ></input>
+          <button type="submit">Create my Queu</button>
+        </form>
       </section>
     );
   }

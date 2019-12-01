@@ -1,38 +1,32 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
+import PTRegistration from "./PTRegistration";
 
 class landing extends Component {
-  login = async e => {
-    e.preventDefault();
-    console.log("here");
+  constructor(props) {
+    super(props);
+    this.state = {
+      eventName: ""
+    };
+  }
 
-    let data = new FormData();
-    data.append("email", "email@test.test");
-    data.append("password", "thisisapasswordhi");
+  componentDidMount() {
+    this.setState({ eventName: this.props.match.params.eventID });
+  }
 
-    let response = await fetch("/register", {
-      method: "POST",
-      body: data
-    });
-
-    let resBody = await response.text();
-    console.log(resBody);
-
-    this.props.dispatch({
-      type: "login",
-      authStatus: { type: "PT", isLoggedIn: true }
-    });
-  };
   render() {
-    return (
-      <section>
-        Sign up as a participant here PLEASSSSEEE WORK
-        <form onSubmit={this.login}>
-          <button type="submit">signup</button>
-        </form>
-      </section>
-    );
+    if (this.props.match.params.eventID) {
+      return (
+        <section>
+          Going to {this.state.eventName} but don't have a team? Sign up as a
+          participant here
+          <PTRegistration></PTRegistration>
+        </section>
+      );
+    } else {
+      return <section>welcome to queu</section>;
+    }
   }
 }
 
@@ -40,6 +34,6 @@ let propList = () => {
   return {};
 };
 
-let Landing = connect(propList)(landing);
+let Landing = connect(propList)(withRouter(landing));
 
 export default Landing;

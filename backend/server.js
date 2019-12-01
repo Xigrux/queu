@@ -12,11 +12,11 @@ let app = express();
 
 let upload = multer();
 
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "http://localhost:8080" }));
 
 let dbo;
 let url =
-  "mongodb+srv://lulu:123@cluster0-jjd2c.mongodb.net/test?retryWrites=true&w=majority";
+  "mongodb+srv://lulul:123@cluster0-jjd2c.mongodb.net/test?retryWrites=true&w=majority";
 app.use("/", express.static("build"));
 
 MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
@@ -45,12 +45,48 @@ app.post("/register", upload.none(), (req, res) => {
     .then(function(userRecord) {
       // See the UserRecord reference doc for the contents of userRecord.
       console.log("Successfully created new user:", userRecord.uid);
+      res.send(userRecord.uids);
     })
     .catch(function(error) {
       console.log("Error creating new user:", error);
     });
 });
 
+app.post("/create-a-queu", upload.none(), (req, res) => {
+  console.log("in /create-a-queu");
+  console.log(req.body);
+  let event = req.body.event;
+  let email = req.body.email;
+  let password = req.body.password;
+  let eventID;
+  admin
+    .auth()
+    .createUser({
+      email,
+      emailVerified: false,
+      password
+    })
+    .then(function(userRecord) {
+      // See the UserRecord reference doc for the contents of userRecord.
+      eventID = userRecord.uid;
+
+      dbo.collection("organizers").insertOne(
+        {
+          eventID,
+          event,
+          email
+        },
+        (err, item) => {
+          res.send(JSON.stringify(item));
+        }
+      );
+
+      console.log("Successfully created new user:", userRecord.uid);
+    })
+    .catch(function(error) {
+      console.log("Error creating new user:", error);
+    });
+});
 //=============================== LISTENER ===============================//
 app.listen("4000", () => {
   console.log("Server up");

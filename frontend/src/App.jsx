@@ -21,8 +21,12 @@ class app extends Component {
             userType={this.props.authStatus.type}
           ></Nav>
 
-          {/* renders for root page */}
           <Route path="/" exact={true}>
+            <Landing />
+          </Route>
+
+          {/* renders for root page */}
+          <Route path="/:eventID" exact={true}>
             {/* if no logged in */}
             {!this.props.authStatus.isLoggedIn && <Landing />}
             {/* if logged in as OG*/}
@@ -33,11 +37,11 @@ class app extends Component {
               this.props.authStatus.type === "PT" && <PTDash />}
           </Route>
 
-          <Route path="/create-a-queu">
+          <Route path="/event/create-a-queu" exact={true}>
             <CAQ />
           </Route>
 
-          <Route path="/signin">
+          <Route path="/user/signin" exact={true}>
             <SignIn />
           </Route>
         </BrowserRouter>
