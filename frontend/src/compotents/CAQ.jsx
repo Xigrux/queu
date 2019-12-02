@@ -8,7 +8,8 @@ class caq extends Component {
     this.state = {
       event: undefined,
       email: undefined,
-      password: undefined
+      password: undefined,
+      maxTeamSize: undefined
     };
   }
 
@@ -20,6 +21,7 @@ class caq extends Component {
     data.append("event", this.state.event);
     data.append("email", this.state.email);
     data.append("password", this.state.password);
+    data.append("maxTeamSize", this.state.maxTeamSize);
 
     let response = await fetch("/create-a-queu", {
       method: "POST",
@@ -52,6 +54,11 @@ class caq extends Component {
     this.setState({ password: e.target.value });
     console.log(this.state);
   };
+  handleMaxTeamSize = e => {
+    e.preventDefault();
+    this.setState({ maxTeamSize: e.target.value });
+    console.log(this.state);
+  };
 
   render() {
     return (
@@ -74,6 +81,12 @@ class caq extends Component {
             type="text"
             name="password"
             placeholder="password"
+          ></input>
+          <input
+            onChange={this.handleMaxTeamSize}
+            type="number"
+            name="maxTeamSize"
+            placeholder="max team size"
           ></input>
           <button type="submit">Create my Queu</button>
         </form>

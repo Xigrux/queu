@@ -53,11 +53,10 @@ app.post("/register", upload.none(), (req, res) => {
 });
 
 app.post("/create-a-queu", upload.none(), (req, res) => {
-  console.log("in /create-a-queu");
-  console.log(req.body);
   let event = req.body.event;
   let email = req.body.email;
   let password = req.body.password;
+  let maxTeamSize = req.body.maxTeamSize;
   let eventID;
   admin
     .auth()
@@ -74,7 +73,8 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
         {
           eventID,
           event,
-          email
+          email,
+          maxTeamSize
         },
         (err, organizer) => {
           res.send(JSON.stringify(organizer));
@@ -90,7 +90,6 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
 
 app.post("/get-event", upload.none(), (req, res) => {
   let eventID = req.body.eventID;
-  console.log(eventID);
 
   dbo
     .collection("organizers")
