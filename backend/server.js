@@ -63,6 +63,9 @@ app.post("/register", upload.none(), (req, res) => {
           roleAssoc
         },
         (err, paritcipant) => {
+          if (err) {
+            return res.send(JSON.stringify({ success: false }));
+          }
           res.send(JSON.stringify(paritcipant));
         }
       );
@@ -101,7 +104,10 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
           maxTeamSize
         },
         (err, organizer) => {
-          res.send(JSON.stringify(organizer));
+          if (err) {
+            return res.send(JSON.stringify({ success: false }));
+          }
+          res.send(JSON.stringify(eventID));
         }
       );
 

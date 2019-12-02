@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 class caq extends Component {
@@ -28,15 +28,17 @@ class caq extends Component {
       body: data
       // cors: "no-cors"
     });
-
     let resBody = await response.text();
-    console.log(resBody);
+    let eventID = JSON.parse(resBody);
 
     this.props.dispatch({
       type: "login",
       authStatus: { type: "OG", isLoggedIn: true }
     });
+
+    this.props.history.push("/" + eventID);
   };
+
   handleInput = e => {
     e.preventDefault();
     let input = e.target.name;
@@ -83,6 +85,6 @@ let propList = () => {
   return {};
 };
 
-let CAQ = connect(propList)(caq);
+let CAQ = connect(propList)(withRouter(caq));
 
 export default CAQ;

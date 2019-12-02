@@ -140,10 +140,11 @@ class ptregistration extends Component {
 
           <input
             type="number"
-            max={parseInt(this.props.maxTeamSize)}
+            max={parseInt(this.props.maxTeamSize) - 1}
+            min="0"
             onChange={this.handleInput}
             name="size"
-            placeholder="size"
+            placeholder="1"
             required
           />
 
