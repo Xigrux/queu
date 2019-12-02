@@ -7,19 +7,29 @@ class landing extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      eventName: ""
+      event: undefined
     };
   }
 
-  componentDidMount() {
-    this.setState({ eventName: this.props.match.params.eventID });
-  }
+  componentDidMount = async () => {
+    let data = new FormData();
+    data.append("eventID", this.props.match.params.eventID);
+
+    let response = await fetch("/get-event", { method: "POST", body: data });
+
+    let resBody = await response.text();
+
+    let eventObj = JSON.parse(resBody);
+    console.log(eventObj);
+
+    this.setState({ event: eventObj.event });
+  };
 
   render() {
     if (this.props.match.params.eventID) {
       return (
         <section>
-          Going to {this.state.eventName} but don't have a team? Sign up as a
+          Going to {this.state.event} but don't have a team? Sign up as a
           participant here
           <PTRegistration></PTRegistration>
         </section>

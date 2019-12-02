@@ -76,8 +76,8 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
           event,
           email
         },
-        (err, item) => {
-          res.send(JSON.stringify(item));
+        (err, organizer) => {
+          res.send(JSON.stringify(organizer));
         }
       );
 
@@ -85,6 +85,20 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
     })
     .catch(function(error) {
       console.log("Error creating new user:", error);
+    });
+});
+
+app.post("/get-event", upload.none(), (req, res) => {
+  let eventID = req.body.eventID;
+  console.log(eventID);
+
+  dbo
+    .collection("organizers")
+    .findOne({ eventID: eventID }, (err, eventObj) => {
+      if (err) {
+        return res.send(JSON.stringify({ success: false }));
+      }
+      res.send(JSON.stringify(eventObj));
     });
 });
 //=============================== LISTENER ===============================//
