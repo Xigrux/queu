@@ -8,15 +8,16 @@ let reducer = (state, action) => {
     return { ...state, authStatus: { type: undefined, isLoggedIn: false } };
   }
 
-  if (action.type === "load-event") {
-    return { ...state, event: action.event };
+  if (action.type === "load-eventObj") {
+    return { ...state, event: action.eventObj };
   }
+
   return state;
 };
 
 let initialState = {
   authStatus: { type: "OG", isLoggedIn: false },
-  event: undefined
+  eventObj: undefined
 };
 
 let store = createStore(

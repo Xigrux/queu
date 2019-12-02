@@ -7,7 +7,7 @@ class landing extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      event: undefined
+      eventObj: {}
     };
   }
 
@@ -21,18 +21,23 @@ class landing extends Component {
 
     let eventObj = JSON.parse(resBody);
 
-    this.setState({ event: eventObj.event, maxTeamSize: eventObj.maxTeamSize });
+    this.setState({
+      eventObj
+    });
 
-    this.props.dispatch({ type: "load-event", event: eventObj });
+    this.props.dispatch({ type: "load-event", eventObj: eventObj });
   };
 
   render() {
     if (this.props.match.params.eventID) {
       return (
         <section>
-          Going to <b>{this.state.event}</b> but don't have a team? Sign up as a
-          participant here
-          <PTRegistration maxTeamSize={this.state.maxTeamSize}></PTRegistration>
+          Going to <b>{this.state.eventObj.event}</b> but don't have a team?
+          Sign up as a participant here
+          <PTRegistration
+            maxTeamSize={this.state.eventObj.maxTeamSize}
+            eventID={this.state.eventObj.eventID}
+          ></PTRegistration>
         </section>
       );
     } else {

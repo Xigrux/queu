@@ -33,8 +33,16 @@ admin.initializeApp({
 app.post("/register", upload.none(), (req, res) => {
   console.log("in register");
   console.log(req.body);
+  let username = req.body.username;
   let email = req.body.email;
   let password = req.body.password;
+  let messenger = req.body.messenger;
+  let role = req.body.role;
+  let stack = req.body.stack;
+  let size = req.body.size;
+  let roleAssoc = req.body.roleAssoc;
+  let eventID = req.body.eventID;
+
   admin
     .auth()
     .createUser({
@@ -43,6 +51,21 @@ app.post("/register", upload.none(), (req, res) => {
       password
     })
     .then(function(userRecord) {
+      dbo.collection("participants").insertOne(
+        {
+          eventID,
+          username,
+          email,
+          messenger,
+          role,
+          stack,
+          size,
+          roleAssoc
+        },
+        (err, paritcipant) => {
+          res.send(JSON.stringify(paritcipant));
+        }
+      );
       // See the UserRecord reference doc for the contents of userRecord.
       console.log("Successfully created new user:", userRecord.uid);
       res.send(userRecord.uids);
@@ -53,6 +76,7 @@ app.post("/register", upload.none(), (req, res) => {
 });
 
 app.post("/create-a-queu", upload.none(), (req, res) => {
+  console.log(req.body);
   let event = req.body.event;
   let email = req.body.email;
   let password = req.body.password;

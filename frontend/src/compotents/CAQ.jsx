@@ -18,10 +18,10 @@ class caq extends Component {
     console.log("here");
 
     let data = new FormData();
-    data.append("event", this.state.event);
-    data.append("email", this.state.email);
-    data.append("password", this.state.password);
-    data.append("maxTeamSize", this.state.maxTeamSize);
+    let inputs = Object.keys(this.state);
+    inputs.forEach(input => {
+      data.append(input, this.state[input]);
+    });
 
     let response = await fetch("/create-a-queu", {
       method: "POST",
@@ -34,29 +34,13 @@ class caq extends Component {
 
     this.props.dispatch({
       type: "login",
-      authStatus: { type: "PT", isLoggedIn: true }
+      authStatus: { type: "OG", isLoggedIn: true }
     });
   };
-  handleEvent = e => {
+  handleInput = e => {
     e.preventDefault();
-    this.setState({ event: e.target.value });
-    console.log(this.state);
-  };
-
-  handleEmail = e => {
-    e.preventDefault();
-    this.setState({ email: e.target.value });
-    console.log(this.state);
-  };
-
-  handlePassword = e => {
-    e.preventDefault();
-    this.setState({ password: e.target.value });
-    console.log(this.state);
-  };
-  handleMaxTeamSize = e => {
-    e.preventDefault();
-    this.setState({ maxTeamSize: e.target.value });
+    let input = e.target.name;
+    this.setState({ [input]: e.target.value });
     console.log(this.state);
   };
 
@@ -65,25 +49,25 @@ class caq extends Component {
       <section>
         <form onSubmit={this.createQueu}>
           <input
-            onChange={this.handleEvent}
+            onChange={this.handleInput}
             type="text"
             name="event"
             placeholder="event"
           ></input>
           <input
-            onChange={this.handleEmail}
+            onChange={this.handleInput}
             type="text"
             name="email"
             placeholder="email"
           ></input>
           <input
-            onChange={this.handlePassword}
+            onChange={this.handleInput}
             type="text"
             name="password"
             placeholder="password"
           ></input>
           <input
-            onChange={this.handleMaxTeamSize}
+            onChange={this.handleInput}
             type="number"
             name="maxTeamSize"
             placeholder="max team size"
