@@ -35,6 +35,10 @@ class nav extends Component {
   }
 }
 
+let propList = () => {
+  return {};
+};
+
 let Nav = connect()(nav);
 
 export default Nav;

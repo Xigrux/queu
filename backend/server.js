@@ -7,15 +7,8 @@ let ObjectID = require("mongodb").ObjectID;
 let admin = require("firebase-admin");
 let serviceAccount = require("./firebase-service-key.json");
 let firebase = require("firebase");
-let firebaseConfig = {
-  apiKey: "AIzaSyBNJzeM_W8mJUvTc8eXrL7CNq2EvLFOr60",
-  authDomain: "queu-d353d.firebaseapp.com",
-  databaseURL: "https://queu-d353d.firebaseio.com",
-  projectId: "queu-d353d",
-  storageBucket: "queu-d353d.appspot.com",
-  messagingSenderId: "314527117650",
-  appId: "1:314527117650:web:132f1a57fbf9c90b034a8b"
-};
+let nodemailer = require("nodemailer");
+
 //=============================== INITIALIZE LIBRARIES ===============================//
 let app = express();
 
@@ -37,8 +30,51 @@ admin.initializeApp({
   databaseURL: "https://queu-d353d.firebaseio.com"
 });
 
+// Config Firebase
+let firebaseConfig = {
+  apiKey: "AIzaSyBNJzeM_W8mJUvTc8eXrL7CNq2EvLFOr60",
+  authDomain: "queu-d353d.firebaseapp.com",
+  databaseURL: "https://queu-d353d.firebaseio.com",
+  projectId: "queu-d353d",
+  storageBucket: "queu-d353d.appspot.com",
+  messagingSenderId: "314527117650",
+  appId: "1:314527117650:web:132f1a57fbf9c90b034a8b"
+};
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+
+var transport = nodemailer.createTransport({
+  host: "smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "c5ba319b17cc67",
+    pass: "a9be4eb156c304"
+  }
+});
+
+var mailOptions = {
+  from: '"Example Team" <from@example.com>',
+  to: "user1@example.com, user2@example.com",
+  subject: "Nice Nodemailer test",
+  text: "Hey there, it’s our first message sent with Nodemailer ",
+  html:
+    '<b>Hey there! </b><br> This is our first message sent with Nodemailer<br /><img src="cid:uniq-mailtrap.png" alt="mailtrap" />'
+  // attachments: [
+  //   {
+  //     filename: "mailtrap.png",
+  //     path: __dirname + "/mailtrap.png",
+  //     cid: "uniq-mailtrap.png"
+  //   }
+  // ]
+};
+
+// transport.sendMail(mailOptions, (error, info) => {
+//   if (error) {
+//     return console.log(error);
+//   }
+//   console.log("Message sent: %s", info.messageId);
+// });
 
 //=============================== ENDPOINTS ===============================//
 
@@ -82,6 +118,13 @@ app.post("/register", upload.none(), (req, res) => {
           if (err) {
             return res.send(JSON.stringify({ success: false }));
           } else {
+            transport.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                return console.log(error);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
+
             dbo
               .collection("participants")
               .findOne({ participantID }, (err, participant) => {
