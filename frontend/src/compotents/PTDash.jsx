@@ -24,7 +24,6 @@ class ptdash extends Component {
   };
 
   render() {
-    console.log(this.props);
     return (
       <section>
         participant dashboard{this.state.eventObj.event}{" "}

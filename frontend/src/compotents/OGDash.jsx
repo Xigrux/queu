@@ -23,7 +23,15 @@ class ogdash extends Component {
   };
 
   render() {
-    return <section>organizer dashboard {this.state.eventObj.event}</section>;
+    return (
+      <section>
+        organizer dashboard for {this.state.eventObj.event}
+        <div>
+          here's the link you can send :{" "}
+          {window.location.origin + "/" + this.state.eventObj.eventID}
+        </div>
+      </section>
+    );
   }
 }
 

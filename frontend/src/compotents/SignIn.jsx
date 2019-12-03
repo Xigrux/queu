@@ -31,10 +31,10 @@ class signin extends Component {
       // cors: "no-cors"
     });
     let resBody = await response.text();
-    // let eventID = JSON.parse(resBody);
     let userData = JSON.parse(resBody);
 
     if (userData.participantID) {
+      // if the user is an PT
       this.props.dispatch({
         type: "load-participantObj",
         participantObj: userData
@@ -45,6 +45,7 @@ class signin extends Component {
       });
       return this.props.history.push("/" + userData.eventID);
     } else if (userData.event) {
+      // if the user is an OG
       this.props.dispatch({
         type: "login",
         authStatus: { type: "OG", isLoggedIn: true }

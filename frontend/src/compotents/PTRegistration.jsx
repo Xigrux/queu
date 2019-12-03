@@ -56,18 +56,11 @@ class ptregistration extends Component {
       } else {
         this.state[input].push(e.target.value);
       }
+
+      console.log(this.state);
     } else {
       this.setState({ [input]: e.target.value });
     }
-
-    // username: undefined,
-    // email: undefined,
-    // password: undefined,
-    // messenger: undefined,
-    // role: [],
-    // stack: [],
-    // size: undefined,
-    // roleAssoc: []
   };
 
   render() {
@@ -107,41 +100,42 @@ class ptregistration extends Component {
           />
 
           <label>role</label>
-          <form onChange={this.handleInput}>
-            <label for="pt-design">Design</label>
+          <div onChange={this.handleInput}>
+            <label htmlFor="pt-design">Design</label>
             <input name="role" value="design" id="pt-design" type="checkbox" />
-            <label for="pt-frontend">Frontend</label>
+            <label htmlFor="pt-frontend">Frontend</label>
             <input
               name="role"
               value="frontend"
               id="pt-frontend"
               type="checkbox"
             />
-            <label for="pt-backend">Backend</label>
+            <label htmlFor="pt-backend">Backend</label>
             <input
               name="role"
               value="backend"
               id="pt-backend"
               type="checkbox"
             />
-          </form>
+          </div>
 
           <label>Stack</label>
-          <form onChange={this.handleInput}>
-            <label for="pt-mean">MEAN</label>
+          <div onChange={this.handleInput}>
+            <label htmlFor="pt-mean">MEAN</label>
             <input name="stack" value="mean" id="pt-mean" type="checkbox" />
-            <label for="pt-mern">MERN</label>
+            <label htmlFor="pt-mern">MERN</label>
             <input name="stack" value="mern" id="pt-mern" type="checkbox" />
-            <label for="pt-python">Python Django</label>
+            <label htmlFor="pt-python">Python Django</label>
             <input name="stack" value="python" id="pt-python" type="checkbox" />
-            <label for="pt-lamp">LAMP</label>
+            <label htmlFor="pt-lamp">LAMP</label>
             <input name="stack" value="lamp" id="pt-lamp" type="checkbox" />
-            <label for="pt-net">.NET</label>
+            <label htmlFor="pt-net">.NET</label>
             <input name="stack" value="net" id="pt-net" type="checkbox"></input>
-            <label for="pt-ruby">Ruby on Rails</label>
+            <label htmlFor="pt-ruby">Ruby on Rails</label>
             <input name="stack" value="ruby" id="pt-ruby" type="checkbox" />
-          </form>
+          </div>
 
+          {/* wtf why is this NaN at the beginning  */}
           <input
             type="number"
             max={parseInt(this.props.maxTeamSize) - 1}
@@ -153,29 +147,29 @@ class ptregistration extends Component {
           />
 
           <label>Looking for teammates for these roles</label>
-          <form onChange={this.handleInput}>
-            <label for="roleAssoc-design">Design</label>
+          <div onChange={this.handleInput}>
+            <label htmlFor="roleAssoc-design">Design</label>
             <input
               name="roleAssoc"
               value="design"
               id="roleAssoc-design"
               type="checkbox"
             />
-            <label for="roleAssoc-frontend">Frontend</label>
+            <label htmlFor="roleAssoc-frontend">Frontend</label>
             <input
               name="roleAssoc"
               value="frontend"
               id="roleAssoc-frontend"
               type="checkbox"
             />
-            <label for="roleAssoc-backend">Backend</label>
+            <label htmlFor="roleAssoc-backend">Backend</label>
             <input
               name="roleAssoc"
               value="backend"
               id="roleAssoc-backend"
               type="checkbox"
             />
-          </form>
+          </div>
 
           <button type="submit">signup</button>
         </form>
