@@ -18,7 +18,6 @@ class ptregistration extends Component {
   }
   register = async e => {
     e.preventDefault();
-    console.log("here");
 
     let data = new FormData();
 
@@ -34,12 +33,19 @@ class ptregistration extends Component {
     });
 
     let resBody = await response.text();
-    console.log(resBody);
 
-    this.props.dispatch({
-      type: "login",
-      authStatus: { type: "PT", isLoggedIn: true }
-    });
+    let participantObj = JSON.parse(resBody);
+
+    if (participantObj) {
+      this.props.dispatch({
+        type: "load-participantObj",
+        participantObj: participantObj
+      });
+      this.props.dispatch({
+        type: "login",
+        authStatus: { type: "PT", isLoggedIn: true }
+      });
+    }
   };
 
   handleInput = e => {
@@ -50,10 +56,8 @@ class ptregistration extends Component {
       } else {
         this.state[input].push(e.target.value);
       }
-      console.log(this.state);
     } else {
       this.setState({ [input]: e.target.value });
-      console.log(this.state);
     }
 
     // username: undefined,

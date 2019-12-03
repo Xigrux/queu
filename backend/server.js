@@ -6,7 +6,16 @@ let MongoClient = require("mongodb").MongoClient;
 let ObjectID = require("mongodb").ObjectID;
 let admin = require("firebase-admin");
 let serviceAccount = require("./firebase-service-key.json");
-
+let firebase = require("firebase");
+let firebaseConfig = {
+  apiKey: "AIzaSyBNJzeM_W8mJUvTc8eXrL7CNq2EvLFOr60",
+  authDomain: "queu-d353d.firebaseapp.com",
+  databaseURL: "https://queu-d353d.firebaseio.com",
+  projectId: "queu-d353d",
+  storageBucket: "queu-d353d.appspot.com",
+  messagingSenderId: "314527117650",
+  appId: "1:314527117650:web:132f1a57fbf9c90b034a8b"
+};
 //=============================== INITIALIZE LIBRARIES ===============================//
 let app = express();
 
@@ -28,6 +37,9 @@ admin.initializeApp({
   databaseURL: "https://queu-d353d.firebaseio.com"
 });
 
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
 //=============================== ENDPOINTS ===============================//
 
 app.post("/register", upload.none(), (req, res) => {
@@ -42,6 +54,7 @@ app.post("/register", upload.none(), (req, res) => {
   let size = req.body.size;
   let roleAssoc = req.body.roleAssoc;
   let eventID = req.body.eventID;
+  let participantID;
 
   admin
     .auth()
@@ -51,6 +64,8 @@ app.post("/register", upload.none(), (req, res) => {
       password
     })
     .then(function(userRecord) {
+      participantID = userRecord.uid;
+
       dbo.collection("participants").insertOne(
         {
           eventID,
@@ -60,18 +75,24 @@ app.post("/register", upload.none(), (req, res) => {
           role,
           stack,
           size,
-          roleAssoc
+          roleAssoc,
+          participantID
         },
-        (err, paritcipant) => {
+        (err, participant) => {
           if (err) {
             return res.send(JSON.stringify({ success: false }));
+          } else {
+            dbo
+              .collection("participants")
+              .findOne({ participantID }, (err, participant) => {
+                res.send(JSON.stringify(participant));
+              });
           }
-          res.send(JSON.stringify(paritcipant));
         }
       );
+
       // See the UserRecord reference doc for the contents of userRecord.
       console.log("Successfully created new user:", userRecord.uid);
-      res.send(userRecord.uids);
     })
     .catch(function(error) {
       console.log("Error creating new user:", error);
@@ -129,6 +150,49 @@ app.post("/get-event", upload.none(), (req, res) => {
       }
       res.send(JSON.stringify(eventObj));
     });
+});
+
+app.post("/signin", upload.none(), (req, res) => {
+  let email = req.body.email;
+  let password = req.body.password;
+  let uid;
+  console.log(req.body);
+
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(email, password)
+    .catch(err => {
+      return res.send(JSON.stringify({ success: false }));
+    });
+
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      // User is signed in.
+      uid = user.uid;
+      console.log("UID", uid);
+
+      dbo
+        .collection("participants")
+        .findOne({ participantID: uid }, (err, participant) => {
+          if (participant) {
+            console.log("participant", participant);
+            res.send(JSON.stringify(participant));
+          } else {
+            dbo
+              .collection("organizers")
+              .findOne({ eventID: uid }, (err, organizer) => {
+                console.log("OG", organizer);
+                res.send(JSON.stringify(organizer));
+              });
+          }
+        });
+      // ...
+    } else {
+      // WTF?
+      // return res.send(JSON.stringify({ success: false }));
+      // ...
+    }
+  });
 });
 //=============================== LISTENER ===============================//
 app.listen("4000", () => {

@@ -5,19 +5,28 @@ let reducer = (state, action) => {
   }
 
   if (action.type === "logout") {
-    return { ...state, authStatus: { type: undefined, isLoggedIn: false } };
+    return {
+      authStatus: { type: undefined, isLoggedIn: false },
+      eventObj: undefined,
+      participantObj: undefined
+    };
   }
 
   if (action.type === "load-eventObj") {
-    return { ...state, event: action.eventObj };
+    return { ...state, eventObj: action.eventObj };
+  }
+
+  if (action.type === "load-participantObj") {
+    return { ...state, participantObj: action.participantObj };
   }
 
   return state;
 };
 
 let initialState = {
-  authStatus: { type: "OG", isLoggedIn: false },
-  eventObj: undefined
+  authStatus: { type: undefined, isLoggedIn: false },
+  eventObj: undefined,
+  participantObj: undefined
 };
 
 let store = createStore(

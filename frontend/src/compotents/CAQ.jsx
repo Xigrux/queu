@@ -15,7 +15,6 @@ class caq extends Component {
 
   createQueu = async e => {
     e.preventDefault();
-    console.log("here");
 
     let data = new FormData();
     let inputs = Object.keys(this.state);
@@ -43,7 +42,6 @@ class caq extends Component {
     e.preventDefault();
     let input = e.target.name;
     this.setState({ [input]: e.target.value });
-    console.log(this.state);
   };
 
   render() {
