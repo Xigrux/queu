@@ -24,6 +24,7 @@ app.use("/", express.static("build"));
 
 MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
   dbo = db.db("Queu");
+  algo();
 });
 
 admin.initializeApp({
@@ -54,7 +55,7 @@ var transport = nodemailer.createTransport({
   }
 });
 
-//=============================== CLEAR ALL USERS ===============================//
+//=============================== ALGO ===============================//
 let PTCat = {
   mean: { design: [], frontend: [], backend: [] },
   mern: { design: [], frontend: [], backend: [] },
@@ -65,7 +66,6 @@ let PTCat = {
 };
 let potentialTeamsObj = {};
 algo = () => {
-  // let mean,mern,python,lamp,net,ruby;
   dbo
     .collection("participants")
     .find({ team: undefined })
@@ -88,12 +88,12 @@ algo = () => {
               PTCat[stack][desiredRole].forEach(potentialTeammate => {
                 potentialTeammate.roleAssoc.forEach(potentialRole => {
                   if (
-                    desiredRole === potentialRole && // role criteria
+                    PT.role.includes(potentialRole) && // role criteria
                     PT.size === potentialTeammate.size && // size criteria
                     PT.participantID !== potentialTeammate.participantID && // not the same person
                     potentialTeammate.potentialTeam === undefined // at least one person doesn't have a team yet
                   ) {
-                    if (PT.potentialTeam) {
+                    if (PT.potentialTeam !== undefined) {
                       let allPTs = Object.keys(potentialTeamsObj);
                       let dupes = 0;
                       allPTs.forEach(PPT => {
@@ -111,8 +111,11 @@ algo = () => {
                       let potentialTeamID = Math.random()
                         .toString(36)
                         .slice(-8);
+                      //assign the team ID to the PT
                       PT.potentialTeam = potentialTeamID;
+
                       potentialTeammate.potentialTeam = potentialTeamID;
+
                       potentialTeamsObj[PT.participantID] = potentialTeamID;
 
                       potentialTeamsObj[
@@ -127,6 +130,7 @@ algo = () => {
         });
       });
 
+      // console.log(potentialTeamsObj);
       let allPTs = Object.keys(potentialTeamsObj);
       let potentialTeamsArr = [];
 
@@ -135,27 +139,35 @@ algo = () => {
         let teamID = potentialTeamsObj[PT];
         if (potentialTeamsArr.length === 0) {
           // if Arr is empty create first entry
-          potentialTeamsArr.push({ [teamID]: [PT] });
+          potentialTeamsArr.push({ teamID: teamID, team: { [PT]: false } });
         } else {
           // depending if someone was adde to a team cause ID's matched, push the PT or create new team
           let addMember = false;
           potentialTeamsArr.forEach(team => {
-            if (teamID in team) {
-              team[teamID].push(PT);
+            if (teamID === team.teamID) {
+              team.team[PT] = false;
               addMember = true;
             }
           });
           if (!addMember) {
-            potentialTeamsArr.push({ [teamID]: [PT] });
+            potentialTeamsArr.push({ teamID: teamID, team: { [PT]: false } });
           }
         }
       });
 
       console.log(potentialTeamsArr);
+
+      // //pushing all the pending teams to pendingTeams collections
+      // potentialTeamsArr.forEach(team => {
+      //   dbo.collection("pendingTeam").insertOne(team, (err, response) => {
+      //     if (err) {
+      //       console.log("errored");
+      //     }
+      //     console.log("check you db");
+      //   });
+      // });
     });
 };
-
-setTimeout(algo, 5000);
 
 //=============================== CLEAR ALL USERS ===============================//
 // let list = [];
