@@ -63,7 +63,7 @@ let PTCat = {
   net: { design: [], frontend: [], backend: [] },
   ruby: { design: [], frontend: [], backend: [] }
 };
-let potentialTeams = {};
+let potentialTeamsObj = {};
 algo = () => {
   // let mean,mern,python,lamp,net,ruby;
   dbo
@@ -78,6 +78,7 @@ algo = () => {
         });
       });
 
+      // this chain pushes all potentials teams to potentialTeamsObj in [PTID]:teamID format
       let allStacks = Object.keys(PTCat);
       allStacks.forEach(stack => {
         let allRoles = Object.keys(PTCat[stack]);
@@ -92,22 +93,18 @@ algo = () => {
                     PT.participantID !== potentialTeammate.participantID && // not the same person
                     potentialTeammate.potentialTeam === undefined // at least one person doesn't have a team yet
                   ) {
-                    // potentialTeams[PT.potentialTeam]={}
-                    // PT.participantID,
-
                     if (PT.potentialTeam) {
-                      let allPTs = Object.keys(potentialTeams);
+                      let allPTs = Object.keys(potentialTeamsObj);
                       let dupes = 0;
                       allPTs.forEach(PPT => {
-                        // console.log(potentialTeams[PPT]);
-                        if (potentialTeams[PPT] === PT.potentialTeam) {
+                        if (potentialTeamsObj[PPT] === PT.potentialTeam) {
                           dupes++;
                         } else {
                           return;
                         }
                       });
                       if (PT.size >= dupes) {
-                        potentialTeams[potentialTeammate.participantID] =
+                        potentialTeamsObj[potentialTeammate.participantID] =
                           PT.potentialTeam;
                       }
                     } else if (PT.potentialTeam === undefined) {
@@ -116,24 +113,12 @@ algo = () => {
                         .slice(-8);
                       PT.potentialTeam = potentialTeamID;
                       potentialTeammate.potentialTeam = potentialTeamID;
-                      potentialTeams[PT.participantID] = potentialTeamID;
+                      potentialTeamsObj[PT.participantID] = potentialTeamID;
 
-                      potentialTeams[
+                      potentialTeamsObj[
                         potentialTeammate.participantID
                       ] = potentialTeamID;
                     }
-
-                    // console.log([
-                    //   // PT.participantID,
-                    //   // PT.potentialTeam,
-                    //   // // PT.role,
-                    //   // // PT.size,
-                    //   // "match",
-                    //   // potentialTeammate.participantID,
-                    //   // potentialTeammate.potentialTeam
-                    //   // // potentialTeammate.role,
-                    //   // // potentialTeammate.size
-                    // ]);
                   }
                 });
               });
@@ -142,25 +127,27 @@ algo = () => {
         });
       });
 
-      // console.log(potentialTeams);
-
-      let allPTs = Object.keys(potentialTeams);
+      let allPTs = Object.keys(potentialTeamsObj);
       let potentialTeamsArr = [];
 
+      // this chain reorganizes potentialTeamsObj to {[teamID]:[PT,PT,PT}} format
       allPTs.forEach(PT => {
-        let teamID = potentialTeams[PT];
-
+        let teamID = potentialTeamsObj[PT];
         if (potentialTeamsArr.length === 0) {
-          potentialTeamsArr.push({ teamID: [PT] });
+          // if Arr is empty create first entry
+          potentialTeamsArr.push({ [teamID]: [PT] });
         } else {
+          // depending if someone was adde to a team cause ID's matched, push the PT or create new team
+          let addMember = false;
           potentialTeamsArr.forEach(team => {
             if (teamID in team) {
-              // console.log(PT);
               team[teamID].push(PT);
-            } else {
-              potentialTeamsArr.push({ teamID: [PT] });
+              addMember = true;
             }
           });
+          if (!addMember) {
+            potentialTeamsArr.push({ [teamID]: [PT] });
+          }
         }
       });
 
