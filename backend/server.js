@@ -124,6 +124,67 @@ algo = () => {
                     }
                   }
                 });
+
+                // console.log(potentialTeamsObj);
+
+                let allPTs = Object.keys(potentialTeamsObj);
+                let teamSize = 0;
+                allPTs.forEach(PPT => {
+                  if (potentialTeamsObj[PPT] === PT.potentialTeam) {
+                    teamSize++;
+                  } else {
+                    return;
+                  }
+                });
+
+                while (teamSize <= PT.size + 1) {
+                  teamSize++;
+                  let randomRole =
+                    PT.roleAssoc[
+                      Math.floor(Math.random() * PT.roleAssoc.length)
+                    ];
+                  PTCat[stack][randomRole].forEach(potentialTeammate => {
+                    potentialTeammate.roleAssoc.forEach(potentialRole => {
+                      if (
+                        PT.role.includes(potentialRole) && // role criteria
+                        PT.size === potentialTeammate.size && // size criteria
+                        PT.participantID !== potentialTeammate.participantID && // not the same person
+                        potentialTeammate.potentialTeam === undefined // at least one person doesn't have a team yet
+                      ) {
+                        if (PT.potentialTeam !== undefined) {
+                          let allPTs = Object.keys(potentialTeamsObj);
+                          let dupes = 0;
+                          allPTs.forEach(PPT => {
+                            if (potentialTeamsObj[PPT] === PT.potentialTeam) {
+                              // console.log("here");
+                              dupes++;
+                            } else {
+                              return;
+                            }
+                          });
+                          if (PT.size + 1 >= dupes) {
+                            potentialTeamsObj[potentialTeammate.participantID] =
+                              PT.potentialTeam;
+                          }
+                        } else if (PT.potentialTeam === undefined) {
+                          let potentialTeamID = Math.random()
+                            .toString(36)
+                            .slice(-8);
+                          //assign the team ID to the PT
+                          PT.potentialTeam = potentialTeamID;
+
+                          potentialTeammate.potentialTeam = potentialTeamID;
+
+                          potentialTeamsObj[PT.participantID] = potentialTeamID;
+
+                          potentialTeamsObj[
+                            potentialTeammate.participantID
+                          ] = potentialTeamID;
+                        }
+                      }
+                    });
+                  });
+                }
               });
             });
           });
