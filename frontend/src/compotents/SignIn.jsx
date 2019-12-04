@@ -46,6 +46,7 @@ class signin extends Component {
       return this.props.history.push("/" + userData.eventID);
     } else if (userData.event) {
       // if the user is an OG
+      console.log("dispatching OG");
       this.props.dispatch({
         type: "login",
         authStatus: { type: "OG", isLoggedIn: true }

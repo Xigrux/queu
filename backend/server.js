@@ -8,6 +8,7 @@ let admin = require("firebase-admin");
 let serviceAccount = require("./firebase-service-key.json");
 let firebase = require("firebase");
 let nodemailer = require("nodemailer");
+let TESTUSERS = require("./testusers.js");
 
 //=============================== INITIALIZE LIBRARIES ===============================//
 let app = express();
@@ -53,6 +54,195 @@ var transport = nodemailer.createTransport({
   }
 });
 
+//=============================== CLEAR ALL USERS ===============================//
+let PTCat = {
+  mean: { design: [], frontend: [], backend: [] },
+  mern: { design: [], frontend: [], backend: [] },
+  python: { design: [], frontend: [], backend: [] },
+  lamp: { design: [], frontend: [], backend: [] },
+  net: { design: [], frontend: [], backend: [] },
+  ruby: { design: [], frontend: [], backend: [] }
+};
+let potentialTeams = {};
+algo = () => {
+  // let mean,mern,python,lamp,net,ruby;
+  dbo
+    .collection("participants")
+    .find({ team: undefined })
+    .toArray((err, PTArr) => {
+      PTArr.forEach(PT => {
+        PT.stack.forEach(tech => {
+          PT.role.forEach(position => {
+            PTCat[tech][position].push(PT);
+          });
+        });
+      });
+
+      let allStacks = Object.keys(PTCat);
+      allStacks.forEach(stack => {
+        let allRoles = Object.keys(PTCat[stack]);
+        allRoles.forEach(role => {
+          PTCat[stack][role].forEach(PT => {
+            PT.roleAssoc.forEach(desiredRole => {
+              PTCat[stack][desiredRole].forEach(potentialTeammate => {
+                potentialTeammate.roleAssoc.forEach(potentialRole => {
+                  if (
+                    desiredRole === potentialRole && // role criteria
+                    PT.size === potentialTeammate.size && // size criteria
+                    PT.participantID !== potentialTeammate.participantID && // not the same person
+                    potentialTeammate.potentialTeam === undefined // at least one person doesn't have a team yet
+                  ) {
+                    // potentialTeams[PT.potentialTeam]={}
+                    // PT.participantID,
+
+                    if (PT.potentialTeam) {
+                      let allPTs = Object.keys(potentialTeams);
+                      let dupes = 0;
+                      allPTs.forEach(PPT => {
+                        // console.log(potentialTeams[PPT]);
+                        if (potentialTeams[PPT] === PT.potentialTeam) {
+                          dupes++;
+                        } else {
+                          return;
+                        }
+                      });
+                      if (PT.size >= dupes) {
+                        potentialTeams[potentialTeammate.participantID] =
+                          PT.potentialTeam;
+                      }
+                    } else if (PT.potentialTeam === undefined) {
+                      let potentialTeamID = Math.random()
+                        .toString(36)
+                        .slice(-8);
+                      PT.potentialTeam = potentialTeamID;
+                      potentialTeammate.potentialTeam = potentialTeamID;
+                      potentialTeams[PT.participantID] = potentialTeamID;
+
+                      potentialTeams[
+                        potentialTeammate.participantID
+                      ] = potentialTeamID;
+                    }
+
+                    // console.log([
+                    //   // PT.participantID,
+                    //   // PT.potentialTeam,
+                    //   // // PT.role,
+                    //   // // PT.size,
+                    //   // "match",
+                    //   // potentialTeammate.participantID,
+                    //   // potentialTeammate.potentialTeam
+                    //   // // potentialTeammate.role,
+                    //   // // potentialTeammate.size
+                    // ]);
+                  }
+                });
+              });
+            });
+          });
+        });
+      });
+
+      // console.log(potentialTeams);
+
+      let allPTs = Object.keys(potentialTeams);
+      let potentialTeamsArr = [];
+
+      allPTs.forEach(PT => {
+        let teamID = potentialTeams[PT];
+
+        if (potentialTeamsArr.length === 0) {
+          potentialTeamsArr.push({ teamID: [PT] });
+        } else {
+          potentialTeamsArr.forEach(team => {
+            if (teamID in team) {
+              // console.log(PT);
+              team[teamID].push(PT);
+            } else {
+              potentialTeamsArr.push({ teamID: [PT] });
+            }
+          });
+        }
+      });
+
+      console.log(potentialTeamsArr);
+    });
+};
+
+setTimeout(algo, 5000);
+
+//=============================== CLEAR ALL USERS ===============================//
+// let list = [];
+// function deleteAllUsers(nextPageToken) {
+//   admin
+//     .auth()
+//     .listUsers(1000, nextPageToken)
+//     .then(listUsersResult => {
+//       listUsersResult.users.forEach(userRecord => {
+//         // console.log(userRecord.uid)
+//         list.push(userRecord.uid);
+//       });
+//     })
+//     .then(() => {
+//       let i = 0;
+//       setInterval(() => {
+//         i++;
+//         console.log(list[i]);
+//         admin
+//           .auth()
+//           .deleteUser(list[i])
+//           .then(() => {
+//             console.log("success");
+//           })
+//           .catch(err => console.log(err));
+//       }, 1000);
+//     });
+// }
+// deleteAllUsers();
+
+// //=============================== INJECT USERS===============================//
+
+// TESTUSERS.forEach(user => {
+//   let username = user.username;
+//   let email = user.email;
+//   let password = user.password;
+//   let messenger = user.messenger;
+//   let role = user.role;
+//   let stack = user.stack;
+//   let size = user.size;
+//   let roleAssoc = user.roleAssoc;
+//   let eventID = user.eventID;
+//   let participantID;
+
+//   admin
+//     .auth()
+//     .createUser({
+//       email,
+//       emailVerified: false,
+//       password
+//     })
+//     .then(function(userRecord) {
+//       participantID = userRecord.uid;
+
+//       dbo.collection("participants").insertOne({
+//         eventID,
+//         username,
+//         email,
+//         messenger,
+//         role,
+//         stack,
+//         size,
+//         roleAssoc,
+//         team: undefined,
+//         participantID
+//       });
+//       // See the UserRecord reference doc for the contents of userRecord.
+//       console.log("Successfully created new user:", userRecord.uid);
+//     })
+//     .catch(function(error) {
+//       console.log("Error creating new user:", error);
+//     });
+// });
+
 //=============================== ENDPOINTS ===============================//
 
 app.post("/register", upload.none(), (req, res) => {
@@ -89,6 +279,7 @@ app.post("/register", upload.none(), (req, res) => {
           stack,
           size,
           roleAssoc,
+          team: undefined,
           participantID
         },
         (err, participant) => {
@@ -178,6 +369,9 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
 
 app.post("/get-event", upload.none(), (req, res) => {
   let eventID = req.body.eventID;
+  let eventObject;
+  let eventParticipants;
+  let participantsTotal;
 
   dbo
     .collection("organizers")
@@ -185,7 +379,18 @@ app.post("/get-event", upload.none(), (req, res) => {
       if (err) {
         return res.send(JSON.stringify({ success: false }));
       }
-      res.send(JSON.stringify(eventObj));
+      eventObject = eventObj;
+
+      dbo
+        .collection("participants")
+        .find({ eventID: eventObject.eventID })
+        .toArray((err, PTArr) => {
+          eventParticipants = PTArr;
+          participantsTotal = eventParticipants.length;
+
+          resObj = { eventObject, participantsTotal };
+          res.send(JSON.stringify(resObj));
+        });
     });
 });
 
@@ -231,6 +436,7 @@ app.post("/signin", upload.none(), (req, res) => {
     }
   });
 });
+
 //=============================== LISTENER ===============================//
 app.listen("4000", () => {
   console.log("Server up");

@@ -13,15 +13,17 @@ class landing extends Component {
 
   componentDidMount = async () => {
     // getting event data and passing to global state
-    let data = new FormData();
-    data.append("eventID", this.props.match.params.eventID);
-    let response = await fetch("/get-event", { method: "POST", body: data });
-    let resBody = await response.text();
-    let eventObj = JSON.parse(resBody);
-    this.setState({
-      eventObj
-    });
-    this.props.dispatch({ type: "load-event", eventObj: eventObj });
+    if (this.props.match.params.eventID) {
+      let data = new FormData();
+      data.append("eventID", this.props.match.params.eventID);
+      let response = await fetch("/get-event", { method: "POST", body: data });
+      let resBody = await response.text();
+      let eventObj = JSON.parse(resBody);
+      this.setState({
+        eventObj
+      });
+      this.props.dispatch({ type: "load-event", eventObj: eventObj });
+    }
   };
 
   render() {
