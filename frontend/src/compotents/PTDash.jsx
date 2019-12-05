@@ -2,7 +2,20 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 
 class ptdash extends Component {
-  componentDidMount() {}
+  componentDidMount = async () => {
+    let data = new FormData();
+
+    data.append("participantID", this.props.participantObj.participantID);
+
+    let response = await fetch("/getteam", {
+      method: "POST",
+      body: data
+      // cors: "no-cors"
+    });
+    let resBody = await response.text();
+    let eventID = JSON.parse(resBody);
+    console.log(eventID);
+  };
   render() {
     return (
       <section>

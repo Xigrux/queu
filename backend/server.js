@@ -26,7 +26,6 @@ app.use("/", express.static("build"));
 
 MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
   dbo = db.db("Queu");
-  algo();
 });
 
 admin.initializeApp({
@@ -135,7 +134,27 @@ var transport = nodemailer.createTransport({
 //=============================== ENDPOINTS ===============================//
 
 app.post("/getteam", upload.none(), (req, res) => {
-  console.log("in get team");
+  let participantID = req.body.participantID;
+  let query = { ["team." + participantID]: { $exists: true } };
+  let pendingTeam;
+
+  dbo
+    .collection("pendingTeam")
+    .find(query)
+    .toArray((err, teamObj) => {
+      pendingTeam = { teamID: teamObj[0].teamID, members: teamObj[0].team };
+      let teamMembers = Object.keys(pendingTeam.members);
+      teamMembers.forEach(member => {
+        dbo
+          .collection("participants")
+          .findOne({ participantID: member }, (err, PT) => {
+            console.log("pt", PT);
+          });
+      });
+
+      console.log(pendingTeam);
+      // returning other users
+    });
 });
 
 app.post("/register", upload.none(), (req, res) => {
