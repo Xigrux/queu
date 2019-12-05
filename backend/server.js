@@ -47,11 +47,11 @@ let firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 var transport = nodemailer.createTransport({
-  host: "smtp.mailtrap.io",
-  port: 2525,
+  host: "smtp.ethereal.email",
+  port: 587,
   auth: {
-    user: "c5ba319b17cc67",
-    pass: "a9be4eb156c304"
+    user: "michael.senger88@ethereal.email",
+    pass: "dYyxrnptWEttVy8RK3"
   }
 });
 
@@ -300,10 +300,43 @@ algo = () => {
             console.log("========== TEAM", team.teamID, "==========");
             // console.log("participant is ", pteam);
 
-            let teamEmails = pteam.map(ppt => {
-              return ppt.email;
+            let teamInfos = pteam.map(ppt => {
+              return [ppt.email, ppt.username];
             });
-            console.log(teamEmails);
+            console.log(teamInfos);
+
+            teamInfos.forEach(member => {
+              // send email
+              var mailOptions = {
+                from: '"Example Team" <from@example.com>',
+                to: member[0],
+                subject: "Nice Nodemailer test",
+                // text:
+                //   "Hey , it’s our first message sent with Nodemailer ",
+                html:
+                  "<b>Hey " +
+                  member[1] +
+                  " </b><br> This is our first message sent with Nodemailer<br />"
+                // <img src="cid:uniq-mailtrap.png" alt="mailtrap" />
+                // attachments: [
+                //   {
+                //     filename: "mailtrap.png",
+                //     path: __dirname + "/mailtrap.png",
+                //     cid: "uniq-mailtrap.png"
+                //   }
+                // ]
+              };
+              let sendIt = () => {
+                transport.sendMail(mailOptions, (error, info) => {
+                  if (error) {
+                    return console.log(error);
+                  }
+                  console.log("Message sent: %s", info.messageId);
+                });
+              };
+              setTimeout(sendIt, 2000);
+            });
+
             console.log("========================================");
             console.log("");
           });
