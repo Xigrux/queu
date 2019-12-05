@@ -87,104 +87,161 @@ algo = () => {
             PT.roleAssoc.forEach(desiredRole => {
               PTCat[stack][desiredRole].forEach(potentialTeammate => {
                 potentialTeammate.roleAssoc.forEach(potentialRole => {
+                  // if (
+                  //   PT.role.includes(potentialRole) && // role criteria
+                  //   PT.size === potentialTeammate.size && // size criteria
+                  //   PT.participantID !== potentialTeammate.participantID && // not the same person
+                  //   potentialTeammate.potentialTeam === undefined &&
+                  //   PT.potentialTeam === undefined // at least one person doesn't have a team yet
+                  // ) {
+                  //   let potentialTeamID = Math.random()
+                  //     .toString(36)
+                  //     .slice(-8);
+                  //   //assign the team ID to the PT
+                  //   PT.potentialTeam = potentialTeamID;
+                  //   potentialTeammate.potentialTeam = potentialTeamID;
+                  //   potentialTeamsObj[PT.participantID] = potentialTeamID;
+                  //   potentialTeamsObj[
+                  //     potentialTeammate.participantID
+                  //   ] = potentialTeamID;
+                  // } else if (
+                  //   PT.role.includes(potentialRole) && // role criteria
+                  //   PT.size === potentialTeammate.size && // size criteria
+                  //   PT.participantID !== potentialTeammate.participantID &&
+                  //   PT.potentialTeam // not the same person// at least one person doesn't have a team yet
+                  // ) {
+                  //   let dupes = 0;
+                  //   let allPTs = Object.keys(potentialTeamsObj);
+                  //   allPTs.forEach(PPT => {
+                  //     if (potentialTeamsObj[PPT] === PT.potentialTeam) {
+                  //       dupes++;
+                  //     } else {
+                  //       return;
+                  //     }
+                  //   });
+                  //   if (PT.size + 1 > dupes) {
+                  //     potentialTeammate.potentialTeam = PT.potentialTeam;
+                  //     potentialTeamsObj[potentialTeammate.participantID] =
+                  //       PT.potentialTeam;
+                  //   }
+                  // }
+
+                  // else if (
+                  //   PT.size === potentialTeammate.size && // size criteria
+                  //   PT.participantID !== potentialTeammate.participantID
+                  // ) {
+                  //   let potentialTeamID = Math.random()
+                  //     .toString(36)
+                  //     .slice(-8);
+                  //   //assign the team ID to the PT
+                  //   let dupes = 0;
+                  //   let allPTs = Object.keys(potentialTeamsObj);
+                  //   allPTs.forEach(PPT => {
+                  //     if (potentialTeamsObj[PPT] === PT.potentialTeam) {
+                  //       dupes++;
+                  //     } else {
+                  //       return;
+                  //     }
+                  //   });
+                  //   if (PT.size + 1 > dupes) {
+                  //     PT.potentialTeam = potentialTeamID;
+                  //     potentialTeammate.potentialTeam = potentialTeamID;
+                  //     potentialTeamsObj[PT.participantID] = potentialTeamID;
+                  //     potentialTeamsObj[
+                  //       potentialTeammate.participantID
+                  //     ] = potentialTeamID;
+                  //   }
+                  // }
+
                   if (
                     PT.role.includes(potentialRole) && // role criteria
                     PT.size === potentialTeammate.size && // size criteria
                     PT.participantID !== potentialTeammate.participantID && // not the same person
                     potentialTeammate.potentialTeam === undefined // at least one person doesn't have a team yet
                   ) {
-                    if (PT.potentialTeam !== undefined) {
-                      let allPTs = Object.keys(potentialTeamsObj);
-                      let dupes = 0;
-                      allPTs.forEach(PPT => {
-                        if (potentialTeamsObj[PPT] === PT.potentialTeam) {
-                          dupes++;
-                        } else {
-                          return;
-                        }
-                      });
-                      if (PT.size >= dupes) {
-                        potentialTeamsObj[potentialTeammate.participantID] =
-                          PT.potentialTeam;
-                      }
-                    } else if (PT.potentialTeam === undefined) {
+                    if (PT.potentialTeam === undefined) {
                       let potentialTeamID = Math.random()
                         .toString(36)
                         .slice(-8);
-                      //assign the team ID to the PT
                       PT.potentialTeam = potentialTeamID;
-
-                      potentialTeammate.potentialTeam = potentialTeamID;
-
                       potentialTeamsObj[PT.participantID] = potentialTeamID;
+                    }
 
-                      potentialTeamsObj[
-                        potentialTeammate.participantID
-                      ] = potentialTeamID;
+                    let dupes = 0;
+                    let allPTs = Object.keys(potentialTeamsObj);
+                    allPTs.forEach(PPT => {
+                      if (potentialTeamsObj[PPT] === PT.potentialTeam) {
+                        dupes++;
+                      } else {
+                        return;
+                      }
+                    });
+                    if (PT.size + 1 > dupes) {
+                      potentialTeammate.potentialTeam = PT.potentialTeam;
+                      potentialTeamsObj[potentialTeammate.participantID] =
+                        PT.potentialTeam;
                     }
                   }
                 });
 
-                // console.log(potentialTeamsObj);
+                // let allPTs = Object.keys(potentialTeamsObj);
+                // let teamSize = 0;
+                // allPTs.forEach(PPT => {
+                //   if (potentialTeamsObj[PPT] === PT.potentialTeam) {
+                //     teamSize++;
+                //   } else {
+                //     return;
+                //   }
+                // });
 
-                let allPTs = Object.keys(potentialTeamsObj);
-                let teamSize = 0;
-                allPTs.forEach(PPT => {
-                  if (potentialTeamsObj[PPT] === PT.potentialTeam) {
-                    teamSize++;
-                  } else {
-                    return;
-                  }
-                });
+                // while (teamSize <= PT.size + 1) {
+                //   teamSize++;
+                //   let randomRole =
+                //     PT.roleAssoc[
+                //       Math.floor(Math.random() * PT.roleAssoc.length)
+                //     ];
+                //   PTCat[stack][randomRole].forEach(potentialTeammate => {
+                //     potentialTeammate.roleAssoc.forEach(potentialRole => {
+                //       if (
+                //         PT.role.includes(potentialRole) && // role criteria
+                //         PT.size === potentialTeammate.size && // size criteria
+                //         PT.participantID !== potentialTeammate.participantID && // not the same person
+                //         potentialTeammate.potentialTeam === undefined // at least one person doesn't have a team yet
+                //       ) {
+                //         if (PT.potentialTeam !== undefined) {
+                //           let allPTs = Object.keys(potentialTeamsObj);
+                //           let dupes = 0;
+                //           allPTs.forEach(PPT => {
+                //             if (potentialTeamsObj[PPT] === PT.potentialTeam) {
+                //               // console.log("here");
+                //               dupes++;
+                //             } else {
+                //               return;
+                //             }
+                //           });
+                //           if (PT.size + 1 >= dupes) {
+                //             potentialTeamsObj[potentialTeammate.participantID] =
+                //               PT.potentialTeam;
+                //           }
+                //         } else if (PT.potentialTeam === undefined) {
+                //           let potentialTeamID = Math.random()
+                //             .toString(36)
+                //             .slice(-8);
+                //           //assign the team ID to the PT
+                //           PT.potentialTeam = potentialTeamID;
 
-                while (teamSize <= PT.size + 1) {
-                  teamSize++;
-                  let randomRole =
-                    PT.roleAssoc[
-                      Math.floor(Math.random() * PT.roleAssoc.length)
-                    ];
-                  PTCat[stack][randomRole].forEach(potentialTeammate => {
-                    potentialTeammate.roleAssoc.forEach(potentialRole => {
-                      if (
-                        PT.role.includes(potentialRole) && // role criteria
-                        PT.size === potentialTeammate.size && // size criteria
-                        PT.participantID !== potentialTeammate.participantID && // not the same person
-                        potentialTeammate.potentialTeam === undefined // at least one person doesn't have a team yet
-                      ) {
-                        if (PT.potentialTeam !== undefined) {
-                          let allPTs = Object.keys(potentialTeamsObj);
-                          let dupes = 0;
-                          allPTs.forEach(PPT => {
-                            if (potentialTeamsObj[PPT] === PT.potentialTeam) {
-                              // console.log("here");
-                              dupes++;
-                            } else {
-                              return;
-                            }
-                          });
-                          if (PT.size + 1 >= dupes) {
-                            potentialTeamsObj[potentialTeammate.participantID] =
-                              PT.potentialTeam;
-                          }
-                        } else if (PT.potentialTeam === undefined) {
-                          let potentialTeamID = Math.random()
-                            .toString(36)
-                            .slice(-8);
-                          //assign the team ID to the PT
-                          PT.potentialTeam = potentialTeamID;
+                //           potentialTeammate.potentialTeam = potentialTeamID;
 
-                          potentialTeammate.potentialTeam = potentialTeamID;
+                //           potentialTeamsObj[PT.participantID] = potentialTeamID;
 
-                          potentialTeamsObj[PT.participantID] = potentialTeamID;
-
-                          potentialTeamsObj[
-                            potentialTeammate.participantID
-                          ] = potentialTeamID;
-                        }
-                      }
-                    });
-                  });
-                }
+                //           potentialTeamsObj[
+                //             potentialTeammate.participantID
+                //           ] = potentialTeamID;
+                //         }
+                //       }
+                //     });
+                //   });
+                // }
               });
             });
           });
@@ -216,17 +273,28 @@ algo = () => {
         }
       });
 
-      console.log(potentialTeamsArr);
+      let pendingTeams = potentialTeamsArr.filter(potentialTeam => {
+        let teamsize = Object.keys(potentialTeam.team);
+        return teamsize.length > 1;
+      });
 
-      // //pushing all the pending teams to pendingTeams collections
-      // potentialTeamsArr.forEach(team => {
-      //   dbo.collection("pendingTeam").insertOne(team, (err, response) => {
-      //     if (err) {
-      //       console.log("errored");
-      //     }
-      //     console.log("check you db");
-      //   });
-      // });
+      // console.log(pendingTeams);
+
+      //pushing all the pending teams to pendingTeams collections
+      pendingTeams.forEach(team => {
+        // dbo.collection("pendingTeam").insertOne(team, (err, response) => {
+        //   if (err) {
+        //     console.log("errored");
+        //   }
+        //   console.log("check you db");
+        // });
+        console.log("========== TEAM", team.teamID, "==========");
+        Object.keys(team.team).forEach(member => {
+          console.log(member);
+        });
+        console.log("========================================");
+        console.log("");
+      });
     });
 };
 
