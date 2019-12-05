@@ -288,12 +288,38 @@ algo = () => {
         //   }
         //   console.log("check you db");
         // });
-        console.log("========== TEAM", team.teamID, "==========");
-        Object.keys(team.team).forEach(member => {
-          console.log(member);
-        });
-        console.log("========================================");
-        console.log("");
+
+        // console.log(team);
+        // console.log(Object.keys(team.team));
+        let teams = Object.keys(team.team);
+
+        dbo
+          .collection("participants")
+          .find({ participantID: { $in: teams } })
+          .toArray((err, pteam) => {
+            console.log("========== TEAM", team.teamID, "==========");
+            // console.log("participant is ", pteam);
+
+            let teamEmails = pteam.map(ppt => {
+              return ppt.email;
+            });
+            console.log(teamEmails);
+            console.log("========================================");
+            console.log("");
+          });
+
+        // Object.keys(team.team).forEach(member => {
+        //   console.log(member);
+        //   // dbo
+        //   //   .collection("participants")
+        //   //   .find({ participantID: member })
+        //   //   .toArray((err, pt) => {
+        //   //     console.log("========== TEAM", team.teamID, "==========");
+        //   //     console.log("participant is ", pt[0].email);
+        //   //     console.log("========================================");
+        //   //     console.log("");
+        //   //   });
+        // });
       });
     });
 };
