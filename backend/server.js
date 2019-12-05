@@ -80,85 +80,27 @@ algo = () => {
 
       // this chain pushes all potentials teams to potentialTeamsObj in [PTID]:teamID format
       let allStacks = Object.keys(PTCat);
+      // navigate to a stack
       allStacks.forEach(stack => {
         let allRoles = Object.keys(PTCat[stack]);
+        // navigate to a role array
         allRoles.forEach(role => {
+          // pick a user at the a time
           PTCat[stack][role].forEach(PT => {
+            // check their desired teammate roles
             PT.roleAssoc.forEach(desiredRole => {
+              // got to the stack and role check through all the users in that role group
               PTCat[stack][desiredRole].forEach(potentialTeammate => {
+                // check each user in role group's roleAssoc preference
                 potentialTeammate.roleAssoc.forEach(potentialRole => {
-                  // if (
-                  //   PT.role.includes(potentialRole) && // role criteria
-                  //   PT.size === potentialTeammate.size && // size criteria
-                  //   PT.participantID !== potentialTeammate.participantID && // not the same person
-                  //   potentialTeammate.potentialTeam === undefined &&
-                  //   PT.potentialTeam === undefined // at least one person doesn't have a team yet
-                  // ) {
-                  //   let potentialTeamID = Math.random()
-                  //     .toString(36)
-                  //     .slice(-8);
-                  //   //assign the team ID to the PT
-                  //   PT.potentialTeam = potentialTeamID;
-                  //   potentialTeammate.potentialTeam = potentialTeamID;
-                  //   potentialTeamsObj[PT.participantID] = potentialTeamID;
-                  //   potentialTeamsObj[
-                  //     potentialTeammate.participantID
-                  //   ] = potentialTeamID;
-                  // } else if (
-                  //   PT.role.includes(potentialRole) && // role criteria
-                  //   PT.size === potentialTeammate.size && // size criteria
-                  //   PT.participantID !== potentialTeammate.participantID &&
-                  //   PT.potentialTeam // not the same person// at least one person doesn't have a team yet
-                  // ) {
-                  //   let dupes = 0;
-                  //   let allPTs = Object.keys(potentialTeamsObj);
-                  //   allPTs.forEach(PPT => {
-                  //     if (potentialTeamsObj[PPT] === PT.potentialTeam) {
-                  //       dupes++;
-                  //     } else {
-                  //       return;
-                  //     }
-                  //   });
-                  //   if (PT.size + 1 > dupes) {
-                  //     potentialTeammate.potentialTeam = PT.potentialTeam;
-                  //     potentialTeamsObj[potentialTeammate.participantID] =
-                  //       PT.potentialTeam;
-                  //   }
-                  // }
-
-                  // else if (
-                  //   PT.size === potentialTeammate.size && // size criteria
-                  //   PT.participantID !== potentialTeammate.participantID
-                  // ) {
-                  //   let potentialTeamID = Math.random()
-                  //     .toString(36)
-                  //     .slice(-8);
-                  //   //assign the team ID to the PT
-                  //   let dupes = 0;
-                  //   let allPTs = Object.keys(potentialTeamsObj);
-                  //   allPTs.forEach(PPT => {
-                  //     if (potentialTeamsObj[PPT] === PT.potentialTeam) {
-                  //       dupes++;
-                  //     } else {
-                  //       return;
-                  //     }
-                  //   });
-                  //   if (PT.size + 1 > dupes) {
-                  //     PT.potentialTeam = potentialTeamID;
-                  //     potentialTeammate.potentialTeam = potentialTeamID;
-                  //     potentialTeamsObj[PT.participantID] = potentialTeamID;
-                  //     potentialTeamsObj[
-                  //       potentialTeammate.participantID
-                  //     ] = potentialTeamID;
-                  //   }
-                  // }
-
+                  // make sure they qualify by ...
                   if (
-                    PT.role.includes(potentialRole) && // role criteria
-                    PT.size === potentialTeammate.size && // size criteria
-                    PT.participantID !== potentialTeammate.participantID && // not the same person
-                    potentialTeammate.potentialTeam === undefined // at least one person doesn't have a team yet
+                    PT.role.includes(potentialRole) && // ... role criteria
+                    PT.size === potentialTeammate.size && // ... size criteria
+                    PT.participantID !== potentialTeammate.participantID && // ... not the same person
+                    potentialTeammate.potentialTeam === undefined // ...incoming potential teammate has no team yet
                   ) {
+                    // if control participant doesn't have team id, give them one
                     if (PT.potentialTeam === undefined) {
                       let potentialTeamID = Math.random()
                         .toString(36)
@@ -166,7 +108,7 @@ algo = () => {
                       PT.potentialTeam = potentialTeamID;
                       potentialTeamsObj[PT.participantID] = potentialTeamID;
                     }
-
+                    // check how many people are already tagged with the same teamID
                     let dupes = 0;
                     let allPTs = Object.keys(potentialTeamsObj);
                     allPTs.forEach(PPT => {
@@ -176,6 +118,8 @@ algo = () => {
                         return;
                       }
                     });
+
+                    // make sure dupes respect team size criteria
                     if (PT.size + 1 > dupes) {
                       potentialTeammate.potentialTeam = PT.potentialTeam;
                       potentialTeamsObj[potentialTeammate.participantID] =
@@ -183,72 +127,12 @@ algo = () => {
                     }
                   }
                 });
-
-                // let allPTs = Object.keys(potentialTeamsObj);
-                // let teamSize = 0;
-                // allPTs.forEach(PPT => {
-                //   if (potentialTeamsObj[PPT] === PT.potentialTeam) {
-                //     teamSize++;
-                //   } else {
-                //     return;
-                //   }
-                // });
-
-                // while (teamSize <= PT.size + 1) {
-                //   teamSize++;
-                //   let randomRole =
-                //     PT.roleAssoc[
-                //       Math.floor(Math.random() * PT.roleAssoc.length)
-                //     ];
-                //   PTCat[stack][randomRole].forEach(potentialTeammate => {
-                //     potentialTeammate.roleAssoc.forEach(potentialRole => {
-                //       if (
-                //         PT.role.includes(potentialRole) && // role criteria
-                //         PT.size === potentialTeammate.size && // size criteria
-                //         PT.participantID !== potentialTeammate.participantID && // not the same person
-                //         potentialTeammate.potentialTeam === undefined // at least one person doesn't have a team yet
-                //       ) {
-                //         if (PT.potentialTeam !== undefined) {
-                //           let allPTs = Object.keys(potentialTeamsObj);
-                //           let dupes = 0;
-                //           allPTs.forEach(PPT => {
-                //             if (potentialTeamsObj[PPT] === PT.potentialTeam) {
-                //               // console.log("here");
-                //               dupes++;
-                //             } else {
-                //               return;
-                //             }
-                //           });
-                //           if (PT.size + 1 >= dupes) {
-                //             potentialTeamsObj[potentialTeammate.participantID] =
-                //               PT.potentialTeam;
-                //           }
-                //         } else if (PT.potentialTeam === undefined) {
-                //           let potentialTeamID = Math.random()
-                //             .toString(36)
-                //             .slice(-8);
-                //           //assign the team ID to the PT
-                //           PT.potentialTeam = potentialTeamID;
-
-                //           potentialTeammate.potentialTeam = potentialTeamID;
-
-                //           potentialTeamsObj[PT.participantID] = potentialTeamID;
-
-                //           potentialTeamsObj[
-                //             potentialTeammate.participantID
-                //           ] = potentialTeamID;
-                //         }
-                //       }
-                //     });
-                //   });
-                // }
               });
             });
           });
         });
       });
 
-      // console.log(potentialTeamsObj);
       let allPTs = Object.keys(potentialTeamsObj);
       let potentialTeamsArr = [];
 
