@@ -15,7 +15,9 @@ let app = express();
 
 let upload = multer();
 
-app.use(cors({ origin: "http://localhost:8080" }));
+let rootPath = "http://localhost:8080";
+
+app.use(cors({ origin: rootPath }));
 
 let dbo;
 let url =
@@ -56,190 +58,6 @@ var transport = nodemailer.createTransport({
 });
 
 //=============================== ALGO ===============================//
-let PTCat = {
-  mean: { design: [], frontend: [], backend: [] },
-  mern: { design: [], frontend: [], backend: [] },
-  python: { design: [], frontend: [], backend: [] },
-  lamp: { design: [], frontend: [], backend: [] },
-  net: { design: [], frontend: [], backend: [] },
-  ruby: { design: [], frontend: [], backend: [] }
-};
-let potentialTeamsObj = {};
-algo = () => {
-  dbo
-    .collection("participants")
-    .find({ team: undefined })
-    .toArray((err, PTArr) => {
-      PTArr.forEach(PT => {
-        PT.stack.forEach(tech => {
-          PT.role.forEach(position => {
-            PTCat[tech][position].push(PT);
-          });
-        });
-      });
-
-      // this chain pushes all potentials teams to potentialTeamsObj in [PTID]:teamID format
-      let allStacks = Object.keys(PTCat);
-      // navigate to a stack
-      allStacks.forEach(stack => {
-        let allRoles = Object.keys(PTCat[stack]);
-        // navigate to a role array
-        allRoles.forEach(role => {
-          // pick a user at the a time
-          PTCat[stack][role].forEach(PT => {
-            // check their desired teammate roles
-            PT.roleAssoc.forEach(desiredRole => {
-              // got to the stack and role check through all the users in that role group
-              PTCat[stack][desiredRole].forEach(potentialTeammate => {
-                // check each user in role group's roleAssoc preference
-                potentialTeammate.roleAssoc.forEach(potentialRole => {
-                  // make sure they qualify by ...
-                  if (
-                    PT.role.includes(potentialRole) && // ... role criteria
-                    PT.size === potentialTeammate.size && // ... size criteria
-                    PT.participantID !== potentialTeammate.participantID && // ... not the same person
-                    potentialTeammate.potentialTeam === undefined // ...incoming potential teammate has no team yet
-                  ) {
-                    // if control participant doesn't have team id, give them one
-                    if (PT.potentialTeam === undefined) {
-                      let potentialTeamID = Math.random()
-                        .toString(36)
-                        .slice(-8);
-                      PT.potentialTeam = potentialTeamID;
-                      potentialTeamsObj[PT.participantID] = potentialTeamID;
-                    }
-                    // check how many people are already tagged with the same teamID
-                    let dupes = 0;
-                    let allPTs = Object.keys(potentialTeamsObj);
-                    allPTs.forEach(PPT => {
-                      if (potentialTeamsObj[PPT] === PT.potentialTeam) {
-                        dupes++;
-                      } else {
-                        return;
-                      }
-                    });
-
-                    // make sure dupes respect team size criteria
-                    if (PT.size + 1 > dupes) {
-                      potentialTeammate.potentialTeam = PT.potentialTeam;
-                      potentialTeamsObj[potentialTeammate.participantID] =
-                        PT.potentialTeam;
-                    }
-                  }
-                });
-              });
-            });
-          });
-        });
-      });
-
-      let allPTs = Object.keys(potentialTeamsObj);
-      let potentialTeamsArr = [];
-
-      // this chain reorganizes potentialTeamsObj to {[teamID]:[PT,PT,PT}} format
-      allPTs.forEach(PT => {
-        let teamID = potentialTeamsObj[PT];
-        if (potentialTeamsArr.length === 0) {
-          // if Arr is empty create first entry
-          potentialTeamsArr.push({ teamID: teamID, team: { [PT]: false } });
-        } else {
-          // depending if someone was adde to a team cause ID's matched, push the PT or create new team
-          let addMember = false;
-          potentialTeamsArr.forEach(team => {
-            if (teamID === team.teamID) {
-              team.team[PT] = false;
-              addMember = true;
-            }
-          });
-          if (!addMember) {
-            potentialTeamsArr.push({ teamID: teamID, team: { [PT]: false } });
-          }
-        }
-      });
-
-      let pendingTeams = potentialTeamsArr.filter(potentialTeam => {
-        let teamsize = Object.keys(potentialTeam.team);
-        return teamsize.length > 1;
-      });
-
-      // console.log(pendingTeams);
-
-      //pushing all the pending teams to pendingTeams collections
-      pendingTeams.forEach(team => {
-        // dbo.collection("pendingTeam").insertOne(team, (err, response) => {
-        //   if (err) {
-        //     console.log("errored");
-        //   }
-        //   console.log("check you db");
-        // });
-
-        // console.log(team);
-        // console.log(Object.keys(team.team));
-        let teams = Object.keys(team.team);
-
-        dbo
-          .collection("participants")
-          .find({ participantID: { $in: teams } })
-          .toArray((err, pteam) => {
-            console.log("========== TEAM", team.teamID, "==========");
-            // console.log("participant is ", pteam);
-
-            let teamInfos = pteam.map(ppt => {
-              return [ppt.email, ppt.username];
-            });
-            console.log(teamInfos);
-
-            teamInfos.forEach(member => {
-              // send email
-              var mailOptions = {
-                from: '"Example Team" <from@example.com>',
-                to: member[0],
-                subject: "Nice Nodemailer test",
-                // text:
-                //   "Hey , it’s our first message sent with Nodemailer ",
-                html:
-                  "<b>Hey " +
-                  member[1] +
-                  " </b><br> This is our first message sent with Nodemailer<br />"
-                // <img src="cid:uniq-mailtrap.png" alt="mailtrap" />
-                // attachments: [
-                //   {
-                //     filename: "mailtrap.png",
-                //     path: __dirname + "/mailtrap.png",
-                //     cid: "uniq-mailtrap.png"
-                //   }
-                // ]
-              };
-              let sendIt = () => {
-                transport.sendMail(mailOptions, (error, info) => {
-                  if (error) {
-                    return console.log(error);
-                  }
-                  console.log("Message sent: %s", info.messageId);
-                });
-              };
-              setTimeout(sendIt, 2000);
-            });
-
-            console.log("========================================");
-            console.log("");
-          });
-
-        // Object.keys(team.team).forEach(member => {
-        //   console.log(member);
-        //   // dbo
-        //   //   .collection("participants")
-        //   //   .find({ participantID: member })
-        //   //   .toArray((err, pt) => {
-        //   //     console.log("========== TEAM", team.teamID, "==========");
-        //   //     console.log("participant is ", pt[0].email);
-        //   //     console.log("========================================");
-        //   //     console.log("");
-        //   //   });
-        // });
-      });
-    });
-};
 
 //=============================== CLEAR ALL USERS ===============================//
 // let list = [];
@@ -316,9 +134,11 @@ algo = () => {
 
 //=============================== ENDPOINTS ===============================//
 
+app.post("/getteam", upload.none(), (req, res) => {
+  console.log("in get team");
+});
+
 app.post("/register", upload.none(), (req, res) => {
-  console.log("in register");
-  console.log(req.body);
   let username = req.body.username;
   let email = req.body.email;
   let password = req.body.password;
@@ -357,32 +177,32 @@ app.post("/register", upload.none(), (req, res) => {
           if (err) {
             return res.send(JSON.stringify({ success: false }));
           } else {
-            // // send email
-            // var mailOptions = {
-            //   from: '"Example Team" <from@example.com>',
-            //   to: email,
-            //   subject: "Nice Nodemailer test",
-            //   // text:
-            //   //   "Hey , it’s our first message sent with Nodemailer ",
-            //   html:
-            //     "<b>Hey " +
-            //     username +
-            //     " </b><br> This is our first message sent with Nodemailer<br />"
-            //   // <img src="cid:uniq-mailtrap.png" alt="mailtrap" />
-            //   // attachments: [
-            //   //   {
-            //   //     filename: "mailtrap.png",
-            //   //     path: __dirname + "/mailtrap.png",
-            //   //     cid: "uniq-mailtrap.png"
-            //   //   }
-            //   // ]
-            // };
-            // transport.sendMail(mailOptions, (error, info) => {
-            //   if (error) {
-            //     return console.log(error);
-            //   }
-            //   console.log("Message sent: %s", info.messageId);
-            // });
+            // send email
+            var mailOptions = {
+              from: '"Example Team" <from@example.com>',
+              to: email,
+              subject: "Nice Nodemailer test",
+              // text:
+              //   "Hey , it’s our first message sent with Nodemailer ",
+              html:
+                "<b>Hey " +
+                username +
+                " </b><br> This is our first message sent with Nodemailer<br />"
+              // <img src="cid:uniq-mailtrap.png" alt="mailtrap" />
+              // attachments: [
+              //   {
+              //     filename: "mailtrap.png",
+              //     path: __dirname + "/mailtrap.png",
+              //     cid: "uniq-mailtrap.png"
+              //   }
+              // ]
+            };
+            transport.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                return console.log(error);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
 
             // send back the userObj to the frontend
             res.send(JSON.stringify(participant.ops));
@@ -506,6 +326,203 @@ app.post("/signin", upload.none(), (req, res) => {
       // ...
     }
   });
+});
+
+app.post("/maketeam", upload.none(), (req, res) => {
+  let PTCat = {
+    mean: { design: [], frontend: [], backend: [] },
+    mern: { design: [], frontend: [], backend: [] },
+    python: { design: [], frontend: [], backend: [] },
+    lamp: { design: [], frontend: [], backend: [] },
+    net: { design: [], frontend: [], backend: [] },
+    ruby: { design: [], frontend: [], backend: [] }
+  };
+  let potentialTeamsObj = {};
+  algo = () => {
+    dbo
+      .collection("participants")
+      .find({ team: undefined })
+      .toArray((err, PTArr) => {
+        PTArr.forEach(PT => {
+          PT.stack.forEach(tech => {
+            PT.role.forEach(position => {
+              PTCat[tech][position].push(PT);
+            });
+          });
+        });
+
+        // this chain pushes all potentials teams to potentialTeamsObj in [PTID]:teamID format
+        let allStacks = Object.keys(PTCat);
+        // navigate to a stack
+        allStacks.forEach(stack => {
+          let allRoles = Object.keys(PTCat[stack]);
+          // navigate to a role array
+          allRoles.forEach(role => {
+            // pick a user at the a time
+            PTCat[stack][role].forEach(PT => {
+              // check their desired teammate roles
+              PT.roleAssoc.forEach(desiredRole => {
+                // got to the stack and role check through all the users in that role group
+                PTCat[stack][desiredRole].forEach(potentialTeammate => {
+                  // check each user in role group's roleAssoc preference
+                  potentialTeammate.roleAssoc.forEach(potentialRole => {
+                    // make sure they qualify by ...
+                    if (
+                      PT.role.includes(potentialRole) && // ... role criteria
+                      PT.size === potentialTeammate.size && // ... size criteria
+                      PT.participantID !== potentialTeammate.participantID && // ... not the same person
+                      potentialTeammate.potentialTeam === undefined // ...incoming potential teammate has no team yet
+                    ) {
+                      // if control participant doesn't have team id, give them one
+                      if (PT.potentialTeam === undefined) {
+                        let potentialTeamID = Math.random()
+                          .toString(36)
+                          .slice(-8);
+                        PT.potentialTeam = potentialTeamID;
+                        potentialTeamsObj[PT.participantID] = potentialTeamID;
+                      }
+                      // check how many people are already tagged with the same teamID
+                      let dupes = 0;
+                      let allPTs = Object.keys(potentialTeamsObj);
+                      allPTs.forEach(PPT => {
+                        if (potentialTeamsObj[PPT] === PT.potentialTeam) {
+                          dupes++;
+                        } else {
+                          return;
+                        }
+                      });
+
+                      // make sure dupes respect team size criteria
+                      if (PT.size + 1 > dupes) {
+                        potentialTeammate.potentialTeam = PT.potentialTeam;
+                        potentialTeamsObj[potentialTeammate.participantID] =
+                          PT.potentialTeam;
+                      }
+                    }
+                  });
+                });
+              });
+            });
+          });
+        });
+
+        let allPTs = Object.keys(potentialTeamsObj);
+        let potentialTeamsArr = [];
+
+        // this chain reorganizes potentialTeamsObj to {[teamID]:[PT,PT,PT}} format
+        allPTs.forEach(PT => {
+          let teamID = potentialTeamsObj[PT];
+          if (potentialTeamsArr.length === 0) {
+            // if Arr is empty create first entry
+            potentialTeamsArr.push({ teamID: teamID, team: { [PT]: false } });
+          } else {
+            // depending if someone was adde to a team cause ID's matched, push the PT or create new team
+            let addMember = false;
+            potentialTeamsArr.forEach(team => {
+              if (teamID === team.teamID) {
+                team.team[PT] = false;
+                addMember = true;
+              }
+            });
+            if (!addMember) {
+              potentialTeamsArr.push({ teamID: teamID, team: { [PT]: false } });
+            }
+          }
+        });
+
+        let pendingTeams = potentialTeamsArr.filter(potentialTeam => {
+          let teamsize = Object.keys(potentialTeam.team);
+          return teamsize.length > 1;
+        });
+
+        // console.log(pendingTeams);
+
+        //pushing all the pending teams to pendingTeams collections
+        pendingTeams.forEach(team => {
+          // dbo.collection("pendingTeam").insertOne(team, (err, response) => {
+          //   if (err) {
+          //     console.log("errored");
+          //   }
+          //   console.log("check you db");
+          // });
+
+          // console.log(team);
+          // console.log(Object.keys(team.team));
+          let teams = Object.keys(team.team);
+
+          dbo
+            .collection("participants")
+            .find({ participantID: { $in: teams } })
+            .toArray((err, pteam) => {
+              console.log("========== TEAM", team.teamID, "==========");
+              // console.log("participant is ", pteam);
+
+              let teamInfos = pteam.map(ppt => {
+                let teammates = [];
+                pteam.forEach(teammate => {
+                  if (teammate.username !== ppt.username) {
+                    teammates.push(
+                      "<li><b>" +
+                        teammate.username +
+                        "</b>: " +
+                        teammate.email +
+                        " or message them through <a target='_blank' href='https://m.me/" +
+                        teammate.messenger +
+                        "'>" +
+                        " Facebook messenger </a></li>"
+                    );
+                  }
+                });
+                console.log(teammates.join(","));
+                return [ppt.email, ppt.username, teammates.join("<br>")];
+              });
+              // console.log(teamInfos);
+
+              teamInfos.forEach(member => {
+                // send email
+                var mailOptions = {
+                  from: '"Queu" <from@example.com>',
+                  to: member[0],
+                  subject: "We found a team for you!",
+                  // text:
+                  //   "Hey , it’s our first message sent with Nodemailer ",
+                  html:
+                    "<b>Hey " +
+                    member[1] +
+                    " </b><br> Here's are your suggested teammates<ul>" +
+                    member[2] +
+                    "</ul>Start chatting away and if you're happy with your team <a href='" +
+                    rootPath +
+                    "/user/signin/" +
+                    member[0] +
+                    "' target='_blank'>login</a> to confirm your spot"
+                  // <img src="cid:uniq-mailtrap.png" alt="mailtrap" />
+                  // attachments: [
+                  //   {
+                  //     filename: "mailtrap.png",
+                  //     path: __dirname + "/mailtrap.png",
+                  //     cid: "uniq-mailtrap.png"
+                  //   }
+                  // ]
+                };
+                let sendIt = () => {
+                  // transport.sendMail(mailOptions, (error, info) => {
+                  //   if (error) {
+                  //     return console.log(error);
+                  //   }
+                  //   console.log("Message sent: %s", info.messageId);
+                  // });
+                  console.log([mailOptions.html]);
+                };
+                setTimeout(sendIt, 2000);
+              });
+
+              console.log("========================================");
+              console.log("");
+            });
+        });
+      });
+  };
 });
 
 //=============================== LISTENER ===============================//

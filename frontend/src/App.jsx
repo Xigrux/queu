@@ -39,6 +39,10 @@ class app extends Component {
           <Route path="/user/signin" exact={true}>
             <SignIn />
           </Route>
+
+          <Route path="/user/signin/:paticipantEmail" exact={true}>
+            <SignIn />
+          </Route>
         </BrowserRouter>
         <Footer></Footer>
       </>

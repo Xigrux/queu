@@ -11,6 +11,10 @@ class signin extends Component {
     };
   }
 
+  componentDidMount = async () => {
+    this.setState({ email: this.props.match.params.paticipantEmail });
+  };
+
   handleInput = e => {
     e.preventDefault();
     let input = e.target.name;
@@ -64,6 +68,7 @@ class signin extends Component {
             type="text"
             name="email"
             placeholder="email"
+            value={this.state.email === undefined ? "" : this.state.email}
           ></input>
           <input
             onChange={this.handleInput}
