@@ -1,7 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import Team from "./Team";
 
 class ptdash extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      teammateArr: []
+    };
+  }
   componentDidMount = async () => {
     let data = new FormData();
 
@@ -13,14 +20,20 @@ class ptdash extends Component {
       // cors: "no-cors"
     });
     let resBody = await response.text();
-    let eventID = JSON.parse(resBody);
-    console.log(eventID);
+    let teammateArr = JSON.parse(resBody);
+    this.setState({ teammateArr });
   };
   render() {
     return (
       <section>
         {this.props.participantObj.username}'s participant dashboard for{" "}
         {this.props.eventObj.event}{" "}
+        {this.state.teammateArr[0] && (
+          <Team
+            teammateArr={this.state.teammateArr}
+            participantID={this.props.participantObj.participantID}
+          ></Team>
+        )}
       </section>
     );
   }

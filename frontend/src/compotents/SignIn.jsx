@@ -50,6 +50,10 @@ class signin extends Component {
       return this.props.history.push("/" + userData.eventID);
     } else if (userData.event) {
       // if the user is an OG
+      this.props.dispatch({
+        type: "load-eventObj",
+        eventObj: userData
+      });
       console.log("dispatching OG");
       this.props.dispatch({
         type: "login",

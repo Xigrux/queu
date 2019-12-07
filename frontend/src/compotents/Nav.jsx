@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 class nav extends Component {
-  logout = () => {
+  logout = async () => {
+    let response = await fetch("/logout");
+    let resBody = await response.text();
+    console.log(resBody);
     this.props.dispatch({ type: "logout" });
   };
 

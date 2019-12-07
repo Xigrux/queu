@@ -3,6 +3,7 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import PTDash from "./PTDash";
 import OGDash from "./OGDash";
+import UpdateCreds from "./UpdateCreds";
 
 class dash extends Component {
   constructor(props) {
@@ -16,7 +17,6 @@ class dash extends Component {
   componentDidMount = async () => {
     // getting event data and passing to global state
     let data = new FormData();
-    console.log(this.props);
     data.append("eventID", this.props.match.params.eventID);
     let response = await fetch("/get-event", { method: "POST", body: data });
     let resBody = await response.text();
@@ -40,6 +40,8 @@ class dash extends Component {
         {this.props.authStatus.type === "PT" && (
           <PTDash eventObj={this.state.eventObj} />
         )}
+
+        <UpdateCreds></UpdateCreds>
       </section>
     );
   }

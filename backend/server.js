@@ -141,19 +141,35 @@ app.post("/getteam", upload.none(), (req, res) => {
   dbo
     .collection("pendingTeam")
     .find(query)
-    .toArray((err, teamObj) => {
+    .toArray(async (err, teamObj) => {
       pendingTeam = { teamID: teamObj[0].teamID, members: teamObj[0].team };
       let teamMembers = Object.keys(pendingTeam.members);
-      teamMembers.forEach(member => {
-        dbo
-          .collection("participants")
-          .findOne({ participantID: member }, (err, PT) => {
-            console.log("pt", PT);
+      let teamMembersArr = await Promise.all(
+        teamMembers.map(async member => {
+          return new Promise((resolve, reject) => {
+            dbo
+              .collection("participants")
+              .findOne({ participantID: member }, async (err, doc) => {
+                if (err) {
+                  reject(err);
+                  return;
+                }
+                resolve(doc);
+              });
           });
+        })
+      );
+
+      let retArr = teamMembersArr.map(member => {
+        console.log(pendingTeam.members[member.participantID]);
+        return {
+          username: member.username,
+          participantID: member.participantID,
+          status: pendingTeam.members[member.participantID]
+        };
       });
 
-      console.log(pendingTeam);
-      // returning other users
+      return res.send(JSON.stringify(retArr));
     });
 });
 
@@ -224,7 +240,7 @@ app.post("/register", upload.none(), (req, res) => {
             });
 
             // send back the userObj to the frontend
-            res.send(JSON.stringify(participant.ops));
+            return res.send(JSON.stringify(participant.ops));
           }
         }
       );
@@ -266,7 +282,7 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
           if (err) {
             return res.send(JSON.stringify({ success: false }));
           }
-          res.send(JSON.stringify(eventID));
+          return res.send(JSON.stringify(eventID));
         }
       );
 
@@ -299,7 +315,7 @@ app.post("/get-event", upload.none(), (req, res) => {
           participantsTotal = eventParticipants.length;
 
           resObj = { eventObject, participantsTotal };
-          res.send(JSON.stringify(resObj));
+          return res.send(JSON.stringify(resObj));
         });
     });
 });
@@ -313,38 +329,103 @@ app.post("/signin", upload.none(), (req, res) => {
   firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
-    .catch(err => {
-      return res.send(JSON.stringify({ success: false }));
-    });
-
-  firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
-      // User is signed in.
-      uid = user.uid;
-      console.log("UID", uid);
-
+    .then(firebaseRes => {
+      uid = firebaseRes.user.uid;
       dbo
         .collection("participants")
         .findOne({ participantID: uid }, (err, participant) => {
           if (participant) {
             console.log("participant", participant);
-            res.send(JSON.stringify(participant));
+            return res.send(JSON.stringify(participant));
           } else {
             dbo
               .collection("organizers")
               .findOne({ eventID: uid }, (err, organizer) => {
                 console.log("OG", organizer);
-                res.send(JSON.stringify(organizer));
+                return res.send(JSON.stringify(organizer));
               });
           }
         });
-      // ...
-    } else {
-      // WTF?
-      // return res.send(JSON.stringify({ success: false }));
-      // ...
-    }
-  });
+    })
+    .catch(err => {
+      console.log("Caught error");
+      return res.send(JSON.stringify({ success: false }));
+    });
+});
+
+app.get("/logout", (res, req) => {
+  console.log("in logout");
+  firebase
+    .auth()
+    .signOut()
+    .then(
+      function() {
+        // Sign-out successful.
+      },
+      function(error) {
+        // An error happened.
+      }
+    );
+});
+
+app.post("/updatecreds", upload.none(), (req, res) => {
+  let oldEmail = req.body.oldEmail;
+  let newEmail = req.body.newEmail;
+  let newPassword = req.body.newPassword;
+
+  console.log("in update", newEmail, newPassword, oldEmail);
+
+  if (newEmail) {
+    firebase
+      .auth()
+      .currentUser.updateEmail(newEmail)
+      .then(function() {
+        // Update successful.
+        console.log("email success");
+        dbo
+          .collection("participants")
+          .updateOne(
+            { email: oldEmail },
+            { $set: { email: newEmail } },
+            (err, participant) => {
+              if (participant) {
+                console.log("participant", participant);
+                // res.send(JSON.stringify(participant));
+              } else {
+                dbo
+                  .collection("organizers")
+                  .updateOne(
+                    { email: oldEmail },
+                    { $set: { email: newEmail } },
+                    (err, organizer) => {
+                      console.log("OG", organizer);
+                      // res.send(JSON.stringify(organizer));
+                    }
+                  );
+              }
+            }
+          );
+      })
+      .catch(function(error) {
+        // An error happened.
+        console.log("email error", error);
+      });
+  }
+  if (newPassword) {
+    console.log("here in new password");
+    console.log(firebase.auth().currentUser);
+    firebase
+      .auth()
+      .currentUser.updatePassword(newPassword)
+      .then(function() {
+        // Update successful.
+        console.log("pw success");
+      })
+      .catch(function(error) {
+        // An error happened.
+        console.log("pw error", error);
+      });
+  }
 });
 
 app.post("/maketeam", upload.none(), (req, res) => {
