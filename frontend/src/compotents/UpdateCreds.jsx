@@ -12,24 +12,35 @@ class updateCreds extends Component {
   }
   handleInput = e => {
     e.preventDefault();
-    let input = e.target.name;
+    let input;
+    if (e.target.name !== "") {
+      input = e.target.name;
+    } else {
+      input = undefined;
+    }
     this.setState({ [input]: e.target.value });
   };
 
-  updateCreds = async () => {
+  updateCreds = async e => {
+    e.preventDefault();
+    console.log("here");
     let data = new FormData();
     let inputs = Object.keys(this.state);
     inputs.forEach(input => {
       data.append(input, this.state[input]);
     });
     data.append("oldEmail", this.props.oldEmail);
+    data.append("userType", this.props.userType);
     let response = await fetch("/updatecreds", {
       method: "POST",
       body: data
       // cors: "no-cors"
     });
     let resBody = await response.text();
-    let userData = JSON.parse(resBody);
+    let success = JSON.parse(resBody);
+    if (success) {
+      console.log(success);
+    }
   };
   render() {
     return (
@@ -48,7 +59,7 @@ class updateCreds extends Component {
             name="newPassword"
             placeholder="newPassword"
           ></input>
-          <button type="submit">Sign in</button>
+          <button type="submit">Update</button>
         </form>
       </section>
     );
@@ -59,7 +70,8 @@ let propList = globalState => {
   return {
     oldEmail: globalState.participantObj
       ? globalState.participantObj.email
-      : globalState.eventObj.email
+      : globalState.eventObj.email,
+    userType: globalState.authStatus.type
   };
 };
 

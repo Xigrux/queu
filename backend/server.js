@@ -368,64 +368,77 @@ app.get("/logout", (res, req) => {
     );
 });
 
-app.post("/updatecreds", upload.none(), (req, res) => {
+app.post("/updatecreds", upload.none(), async (req, res) => {
   let oldEmail = req.body.oldEmail;
   let newEmail = req.body.newEmail;
   let newPassword = req.body.newPassword;
+  let userType = req.body.userType === "PT" ? "participants" : "organizers";
 
-  console.log("in update", newEmail, newPassword, oldEmail);
+  let user = firebase.auth().currentUser;
+  let retMessage = false;
+  let updatePassword = false;
+  let updateEmail = false;
 
-  if (newEmail) {
-    firebase
-      .auth()
-      .currentUser.updateEmail(newEmail)
+  if (newPassword !== "undefined" && newPassword !== "") {
+    passwordUpdated = await user
+      .updatePassword(newPassword)
       .then(function() {
         // Update successful.
-        console.log("email success");
-        dbo
-          .collection("participants")
+        retMessage = true;
+        updatePassword = true;
+        if (
+          (newEmail === "undefined" || newEmail === "") &&
+          updatePassword &&
+          retMessage
+        ) {
+          return res.send(JSON.stringify({ success: "Password updated" }));
+        }
+      })
+      .catch(function(error) {
+        return res.send(JSON.stringify(error));
+      });
+  }
+
+  if (newEmail !== "undefined" && newEmail !== "")
+    user
+      .updateEmail(newEmail)
+      .then(async () => {
+        // Update successful.
+        emailUpdated = await dbo
+          .collection(userType)
           .updateOne(
             { email: oldEmail },
             { $set: { email: newEmail } },
-            (err, participant) => {
-              if (participant) {
-                console.log("participant", participant);
-                // res.send(JSON.stringify(participant));
+            (err, user) => {
+              if (err || user === null) {
+                return res.send(JSON.stringify(err));
               } else {
-                dbo
-                  .collection("organizers")
-                  .updateOne(
-                    { email: oldEmail },
-                    { $set: { email: newEmail } },
-                    (err, organizer) => {
-                      console.log("OG", organizer);
-                      // res.send(JSON.stringify(organizer));
-                    }
+                retMessage = true;
+                updateEmail = true;
+                if (updatePassword && updateEmail && retMessage) {
+                  return res.send(
+                    JSON.stringify({ success: "Email and password updated" })
                   );
+                } else if (
+                  (newPassword === "undefined" ||
+                    newPassword === "" ||
+                    !newPassword) &&
+                  updateEmail &&
+                  retMessage
+                ) {
+                  return res.send(JSON.stringify({ success: "Email updated" }));
+                }
               }
             }
           );
       })
       .catch(function(error) {
-        // An error happened.
-        console.log("email error", error);
+        return res.send(JSON.stringify(error));
       });
-  }
-  if (newPassword) {
-    console.log("here in new password");
-    console.log(firebase.auth().currentUser);
-    firebase
-      .auth()
-      .currentUser.updatePassword(newPassword)
-      .then(function() {
-        // Update successful.
-        console.log("pw success");
-      })
-      .catch(function(error) {
-        // An error happened.
-        console.log("pw error", error);
-      });
-  }
+
+  return res.send(
+    JSON.stringify({ success: "Please enter your new email and/or password" })
+  );
 });
 
 app.post("/maketeam", upload.none(), (req, res) => {
