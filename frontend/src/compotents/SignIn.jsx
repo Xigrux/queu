@@ -11,7 +11,7 @@ class signin extends Component {
     };
   }
 
-  componentDidMount = async () => {
+  componentWillMount = async () => {
     this.setState({ email: this.props.match.params.paticipantEmail });
   };
 

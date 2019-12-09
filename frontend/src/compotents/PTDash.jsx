@@ -9,7 +9,7 @@ class ptdash extends Component {
       teammateArr: []
     };
   }
-  componentDidMount = async () => {
+  componentWillMount = async () => {
     let data = new FormData();
 
     data.append("participantID", this.props.participantObj.participantID);

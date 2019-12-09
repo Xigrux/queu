@@ -441,6 +441,49 @@ app.post("/updatecreds", upload.none(), async (req, res) => {
   );
 });
 
+app.post("/confirmation", upload.none(), (req, res) => {
+  let PTresponse = JSON.parse(req.body.PTresponse);
+  let participantID = req.body.participantID;
+  console.log("in confirmation", PTresponse, participantID);
+
+  dbo
+    .collection("pendingTeam")
+    .findOneAndUpdate(
+      { ["team." + participantID]: { $exists: true } },
+      { $set: { ["team." + participantID]: PTresponse } },
+      { returnOriginal: false },
+      (err, team) => {
+        let memberStatus = team.value.team;
+        let allConfirmed = Object.keys(memberStatus).every(member => {
+          return memberStatus[member] === true;
+        });
+        if (allConfirmed) {
+          dbo
+            .collection("confirmedTeams")
+            .insertOne(
+              { teamID: team.value.teamID, team: team.value.team },
+              (err, team) => {
+                if (err) {
+                  return res.send(JSON.stringify({ success: false }));
+                }
+              }
+            );
+          dbo
+            .collection("pendingTeam")
+            .deleteOne({ teamID: team.value.teamID }, (err, response) => {
+              return res.send(
+                JSON.stringify({ success: true, isTeamComplete: true })
+              );
+            });
+        } else {
+          return res.send(
+            JSON.stringify({ success: true, isTeamComplete: false })
+          );
+        }
+      }
+    );
+});
+
 app.post("/maketeam", upload.none(), (req, res) => {
   let PTCat = {
     mean: { design: [], frontend: [], backend: [] },
@@ -451,7 +494,7 @@ app.post("/maketeam", upload.none(), (req, res) => {
     ruby: { design: [], frontend: [], backend: [] }
   };
   let potentialTeamsObj = {};
-  algo = () => {
+  let algo = () => {
     dbo
       .collection("participants")
       .find({ team: undefined })
@@ -527,18 +570,24 @@ app.post("/maketeam", upload.none(), (req, res) => {
           let teamID = potentialTeamsObj[PT];
           if (potentialTeamsArr.length === 0) {
             // if Arr is empty create first entry
-            potentialTeamsArr.push({ teamID: teamID, team: { [PT]: false } });
+            potentialTeamsArr.push({
+              teamID: teamID,
+              team: { [PT]: undefined }
+            });
           } else {
             // depending if someone was adde to a team cause ID's matched, push the PT or create new team
             let addMember = false;
             potentialTeamsArr.forEach(team => {
               if (teamID === team.teamID) {
-                team.team[PT] = false;
+                team.team[PT] = undefined;
                 addMember = true;
               }
             });
             if (!addMember) {
-              potentialTeamsArr.push({ teamID: teamID, team: { [PT]: false } });
+              potentialTeamsArr.push({
+                teamID: teamID,
+                team: { [PT]: undefined }
+              });
             }
           }
         });

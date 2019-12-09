@@ -11,7 +11,7 @@ class landing extends Component {
     };
   }
 
-  componentDidMount = async () => {
+  componentWillMount = async () => {
     // getting event data and passing to global state
     if (this.props.match.params.eventID) {
       let data = new FormData();

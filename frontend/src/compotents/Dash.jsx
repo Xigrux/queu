@@ -14,7 +14,7 @@ class dash extends Component {
     };
   }
 
-  componentDidMount = async () => {
+  componentWillMount = async () => {
     // getting event data and passing to global state
     let data = new FormData();
     data.append("eventID", this.props.match.params.eventID);
