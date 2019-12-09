@@ -462,31 +462,63 @@ app.post("/confirmation", upload.none(), (req, res) => {
             .collection("confirmedTeams")
             .insertOne(
               { teamID: team.value.teamID, team: team.value.team },
-              (err, team) => {
+              (err, fullTeam) => {
                 if (err) {
                   return res.send(JSON.stringify({ success: false }));
                 }
-              }
-            );
 
-          dbo
-            .collection("participants")
-            .findOneAndUpdate(
-              { participantID: participantID },
-              { $set: { team: team.value.teamID } },
-              (err, team) => {
-                if (err) {
-                  return res.send(JSON.stringify({ success: false }));
-                }
+                Object.keys(team.value.team).forEach(memberID => {
+                  dbo
+                    .collection("participants")
+                    .findOneAndUpdate(
+                      { participantID: memberID },
+                      { $set: { team: team.value.teamID } },
+                      (err, team) => {
+                        if (err) {
+                          return res.send(JSON.stringify({ success: false }));
+                        }
+                      }
+                    );
+                });
+
+                dbo
+                  .collection("participants")
+                  .find({
+                    participantID: { $in: Object.keys(team.value.team) }
+                  })
+                  .toArray((err, memberList) => {
+                    memberList.forEach(member => {
+                      var mailOptions = {
+                        from: '"Queu" <from@example.com>',
+                        to: member.email,
+                        subject: "Your team is ready",
+                        html: "Your team is complete"
+                      };
+                      let sendIt = () => {
+                        transport.sendMail(mailOptions, (error, info) => {
+                          if (error) {
+                            return console.log(error);
+                          }
+                          console.log("Message sent: %s", info.messageId);
+                        });
+                        console.log([mailOptions.html]);
+                      };
+                      setTimeout(sendIt, 2000);
+                    });
+                  });
+
+                dbo
+                  .collection("pendingTeam")
+                  .deleteOne({ teamID: team.value.teamID }, (err, response) => {
+                    return res.send(
+                      JSON.stringify({
+                        success: true,
+                        isTeamComplete: true
+                      })
+                    );
+                  });
               }
             );
-          dbo
-            .collection("pendingTeam")
-            .deleteOne({ teamID: team.value.teamID }, (err, response) => {
-              return res.send(
-                JSON.stringify({ success: true, isTeamComplete: true })
-              );
-            });
         } else {
           return res.send(
             JSON.stringify({ success: true, isTeamComplete: false })
