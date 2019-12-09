@@ -530,17 +530,23 @@ app.post("/confirmation", upload.none(), (req, res) => {
     );
 });
 
-app.post("/maketeam", upload.none(), (req, res) => {
-  let PTCat = {
-    mean: { design: [], frontend: [], backend: [] },
-    mern: { design: [], frontend: [], backend: [] },
-    python: { design: [], frontend: [], backend: [] },
-    lamp: { design: [], frontend: [], backend: [] },
-    net: { design: [], frontend: [], backend: [] },
-    ruby: { design: [], frontend: [], backend: [] }
-  };
-  let potentialTeamsObj = {};
-  let algo = () => {
+app.get("/maketeam", (req, res) => {
+  dbo.collection("pendingTeams").deleteMany({}, (err, success) => {
+    if (err) {
+      res.send(err);
+    }
+    console.log("cleared everything in pending teams");
+
+    let PTCat = {
+      mean: { design: [], frontend: [], backend: [] },
+      mern: { design: [], frontend: [], backend: [] },
+      python: { design: [], frontend: [], backend: [] },
+      lamp: { design: [], frontend: [], backend: [] },
+      net: { design: [], frontend: [], backend: [] },
+      ruby: { design: [], frontend: [], backend: [] }
+    };
+    let potentialTeamsObj = {};
+
     dbo
       .collection("participants")
       .find({ team: undefined })
@@ -643,94 +649,89 @@ app.post("/maketeam", upload.none(), (req, res) => {
           return teamsize.length > 1;
         });
 
-        // console.log(pendingTeamss);
-
         //pushing all the pending teams to pendingTeamss collections
         pendingTeams.forEach(team => {
-          // dbo.collection("pendingTeams").insertOne(team, (err, response) => {
-          //   if (err) {
-          //     console.log("errored");
-          //   }
-          //   console.log("check you db");
-          // });
+          dbo.collection("pendingTeams").insertOne(team, (err, response) => {
+            if (err) {
+            }
+            console.log("check you db");
 
-          // console.log(team);
-          // console.log(Object.keys(team.team));
-          let teams = Object.keys(team.team);
+            let teams = Object.keys(team.team);
 
-          dbo
-            .collection("participants")
-            .find({ participantID: { $in: teams } })
-            .toArray((err, pteam) => {
-              console.log("========== TEAM", team.teamID, "==========");
-              // console.log("participant is ", pteam);
+            dbo
+              .collection("participants")
+              .find({ participantID: { $in: teams } })
+              .toArray((err, pteam) => {
+                console.log("========== TEAM", team.teamID, "==========");
+                // console.log("participant is ", pteam);
 
-              let teamInfos = pteam.map(ppt => {
-                let teammates = [];
-                pteam.forEach(teammate => {
-                  if (teammate.username !== ppt.username) {
-                    teammates.push(
-                      "<li><b>" +
-                        teammate.username +
-                        "</b>: " +
-                        teammate.email +
-                        " or message them through <a target='_blank' href='https://m.me/" +
-                        teammate.messenger +
-                        "'>" +
-                        " Facebook messenger </a></li>"
-                    );
-                  }
+                let teamInfos = pteam.map(ppt => {
+                  let teammates = [];
+                  pteam.forEach(teammate => {
+                    if (teammate.username !== ppt.username) {
+                      teammates.push(
+                        "<li><b>" +
+                          teammate.username +
+                          "</b>: " +
+                          teammate.email +
+                          " or message them through <a target='_blank' href='https://m.me/" +
+                          teammate.messenger +
+                          "'>" +
+                          " Facebook messenger </a></li>"
+                      );
+                    }
+                  });
+
+                  return [ppt.email, ppt.username, teammates.join("<br>")];
                 });
-                console.log(teammates.join(","));
-                return [ppt.email, ppt.username, teammates.join("<br>")];
-              });
-              // console.log(teamInfos);
 
-              teamInfos.forEach(member => {
-                // send email
-                var mailOptions = {
-                  from: '"Queu" <from@example.com>',
-                  to: member[0],
-                  subject: "We found a team for you!",
-                  // text:
-                  //   "Hey , it’s our first message sent with Nodemailer ",
-                  html:
-                    "<b>Hey " +
-                    member[1] +
-                    " </b><br> Here's are your suggested teammates<ul>" +
-                    member[2] +
-                    "</ul>Start chatting away and if you're happy with your team <a href='" +
-                    rootPath +
-                    "/user/signin/" +
-                    member[0] +
-                    "' target='_blank'>login</a> to confirm your spot"
-                  // <img src="cid:uniq-mailtrap.png" alt="mailtrap" />
-                  // attachments: [
-                  //   {
-                  //     filename: "mailtrap.png",
-                  //     path: __dirname + "/mailtrap.png",
-                  //     cid: "uniq-mailtrap.png"
-                  //   }
-                  // ]
-                };
-                let sendIt = () => {
-                  // transport.sendMail(mailOptions, (error, info) => {
-                  //   if (error) {
-                  //     return console.log(error);
-                  //   }
-                  //   console.log("Message sent: %s", info.messageId);
-                  // });
-                  console.log([mailOptions.html]);
-                };
-                setTimeout(sendIt, 2000);
-              });
+                teamInfos.forEach(member => {
+                  // send email
+                  var mailOptions = {
+                    from: '"Queu" <from@example.com>',
+                    to: member[0],
+                    subject: "We found a team for you!",
+                    // text:
+                    //   "Hey , it’s our first message sent with Nodemailer ",
+                    html:
+                      "<b>Hey " +
+                      member[1] +
+                      " </b><br> Here's are your suggested teammates<ul>" +
+                      member[2] +
+                      "</ul>Start chatting away and if you're happy with your team <a href='" +
+                      rootPath +
+                      "/user/signin/" +
+                      member[0] +
+                      "' target='_blank'>login</a> to confirm your spot"
+                    // <img src="cid:uniq-mailtrap.png" alt="mailtrap" />
+                    // attachments: [
+                    //   {
+                    //     filename: "mailtrap.png",
+                    //     path: __dirname + "/mailtrap.png",
+                    //     cid: "uniq-mailtrap.png"
+                    //   }
+                    // ]
+                  };
+                  let sendIt = () => {
+                    transport.sendMail(mailOptions, (error, info) => {
+                      if (error) {
+                        return console.log(error);
+                      }
+                      console.log("Message sent: %s", info.messageId);
+                    });
+                  };
+                  setTimeout(sendIt, 2000);
+                });
 
-              console.log("========================================");
-              console.log("");
-            });
+                console.log("========================================");
+                console.log("");
+              });
+          });
         });
+
+        res.send("done");
       });
-  };
+  });
 });
 
 //=============================== LISTENER ===============================//
