@@ -49,7 +49,7 @@ createUser = numberToCreate => {
         getRandomInt(1, 3)
       ),
       team: undefined,
-      eventID: "aHODgt5c6lZdRshMVT8VubK0huB2"
+      eventID: "gd9DgPcOUZRuCdazYMNcBYTmHoM2"
     });
   }
 };

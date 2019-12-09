@@ -26,6 +26,7 @@ app.use("/", express.static("build"));
 
 MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
   dbo = db.db("Queu");
+  // inject();
 });
 
 admin.initializeApp({
@@ -88,62 +89,63 @@ var transport = nodemailer.createTransport({
 // deleteAllUsers();
 
 // //=============================== INJECT USERS===============================//
+// let inject = () => {
+//   TESTUSERS.forEach(user => {
+//     let username = user.username;
+//     let email = user.email;
+//     let password = user.password;
+//     let messenger = user.messenger;
+//     let role = user.role;
+//     let stack = user.stack;
+//     let size = user.size;
+//     let roleAssoc = user.roleAssoc;
+//     let eventID = user.eventID;
+//     let participantID;
 
-// TESTUSERS.forEach(user => {
-//   let username = user.username;
-//   let email = user.email;
-//   let password = user.password;
-//   let messenger = user.messenger;
-//   let role = user.role;
-//   let stack = user.stack;
-//   let size = user.size;
-//   let roleAssoc = user.roleAssoc;
-//   let eventID = user.eventID;
-//   let participantID;
-
-//   admin
-//     .auth()
-//     .createUser({
-//       email,
-//       emailVerified: false,
-//       password
-//     })
-//     .then(function(userRecord) {
-//       participantID = userRecord.uid;
-
-//       dbo.collection("participants").insertOne({
-//         eventID,
-//         username,
+//     admin
+//       .auth()
+//       .createUser({
 //         email,
-//         messenger,
-//         role,
-//         stack,
-//         size,
-//         roleAssoc,
-//         team: undefined,
-//         participantID
+//         emailVerified: false,
+//         password
+//       })
+//       .then(function(userRecord) {
+//         participantID = userRecord.uid;
+
+//         dbo.collection("participants").insertOne({
+//           eventID,
+//           username,
+//           email,
+//           messenger,
+//           role,
+//           stack,
+//           size,
+//           roleAssoc,
+//           team: undefined,
+//           participantID
+//         });
+//         // See the UserRecord reference doc for the contents of userRecord.
+//         console.log("Successfully created new user:", userRecord.uid);
+//       })
+//       .catch(function(error) {
+//         console.log("Error creating new user:", error);
 //       });
-//       // See the UserRecord reference doc for the contents of userRecord.
-//       console.log("Successfully created new user:", userRecord.uid);
-//     })
-//     .catch(function(error) {
-//       console.log("Error creating new user:", error);
-//     });
-// });
+//   });
+// };
 
 //=============================== ENDPOINTS ===============================//
 
 app.post("/getteam", upload.none(), (req, res) => {
   let participantID = req.body.participantID;
   let query = { ["team." + participantID]: { $exists: true } };
-  let pendingTeam;
+  let pendingTeams;
 
   dbo
-    .collection("pendingTeam")
+    .collection("pendingTeams")
     .find(query)
     .toArray(async (err, teamObj) => {
-      pendingTeam = { teamID: teamObj[0].teamID, members: teamObj[0].team };
-      let teamMembers = Object.keys(pendingTeam.members);
+      pendingTeams = { teamID: teamObj[0].teamID, members: teamObj[0].team };
+      let teamMembers = Object.keys(pendingTeams.members);
       let teamMembersArr = await Promise.all(
         teamMembers.map(async member => {
           return new Promise((resolve, reject) => {
@@ -161,11 +163,11 @@ app.post("/getteam", upload.none(), (req, res) => {
       );
 
       let retArr = teamMembersArr.map(member => {
-        console.log(pendingTeam.members[member.participantID]);
+        console.log(pendingTeams.members[member.participantID]);
         return {
           username: member.username,
           participantID: member.participantID,
-          status: pendingTeam.members[member.participantID]
+          status: pendingTeams.members[member.participantID]
         };
       });
 
@@ -447,7 +449,7 @@ app.post("/confirmation", upload.none(), (req, res) => {
   console.log("in confirmation", PTresponse, participantID);
 
   dbo
-    .collection("pendingTeam")
+    .collection("pendingTeams")
     .findOneAndUpdate(
       { ["team." + participantID]: { $exists: true } },
       { $set: { ["team." + participantID]: PTresponse } },
@@ -508,7 +510,7 @@ app.post("/confirmation", upload.none(), (req, res) => {
                   });
 
                 dbo
-                  .collection("pendingTeam")
+                  .collection("pendingTeams")
                   .deleteOne({ teamID: team.value.teamID }, (err, response) => {
                     return res.send(
                       JSON.stringify({
@@ -641,11 +643,11 @@ app.post("/maketeam", upload.none(), (req, res) => {
           return teamsize.length > 1;
         });
 
-        // console.log(pendingTeams);
+        // console.log(pendingTeamss);
 
-        //pushing all the pending teams to pendingTeams collections
+        //pushing all the pending teams to pendingTeamss collections
         pendingTeams.forEach(team => {
-          // dbo.collection("pendingTeam").insertOne(team, (err, response) => {
+          // dbo.collection("pendingTeams").insertOne(team, (err, response) => {
           //   if (err) {
           //     console.log("errored");
           //   }
