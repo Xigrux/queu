@@ -468,6 +468,18 @@ app.post("/confirmation", upload.none(), (req, res) => {
                 }
               }
             );
+
+          dbo
+            .collection("participants")
+            .findOneAndUpdate(
+              { participantID: participantID },
+              { $set: { team: team.value.teamID } },
+              (err, team) => {
+                if (err) {
+                  return res.send(JSON.stringify({ success: false }));
+                }
+              }
+            );
           dbo
             .collection("pendingTeam")
             .deleteOne({ teamID: team.value.teamID }, (err, response) => {
