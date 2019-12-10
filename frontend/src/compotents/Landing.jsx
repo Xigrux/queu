@@ -18,11 +18,11 @@ class landing extends Component {
       data.append("eventID", this.props.match.params.eventID);
       let response = await fetch("/get-event", { method: "POST", body: data });
       let resBody = await response.text();
-      let eventObj = JSON.parse(resBody);
+      let resObj = JSON.parse(resBody);
       this.setState({
-        eventObj
+        eventObj: resObj.eventObject
       });
-      this.props.dispatch({ type: "load-event", eventObj: eventObj });
+      this.props.dispatch({ type: "load-event", eventObj: resObj.eventObject });
     }
   };
 
@@ -31,6 +31,7 @@ class landing extends Component {
       return (
         <section>
           Going to <b>{this.state.eventObj.event}</b> but don't have a team?
+          <img src={this.state.eventObj.imagePath} alt=""></img>
           Sign up as a participant here
           <PTRegistration
             maxTeamSize={this.state.eventObj.maxTeamSize}

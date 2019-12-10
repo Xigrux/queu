@@ -357,6 +357,7 @@ app.post("/get-event", upload.none(), (req, res) => {
                 teamedUpParticipants,
                 numberOfTeams
               };
+              console.log(resObj);
               return res.send(JSON.stringify(resObj));
             });
         });
