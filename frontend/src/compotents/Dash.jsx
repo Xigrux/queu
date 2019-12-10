@@ -23,7 +23,8 @@ class dash extends Component {
     let resObj = JSON.parse(resBody);
     this.setState({
       eventObj: resObj.eventObject,
-      PTTotal: resObj.participantsTotal
+      PTTotal: resObj.participantsTotal,
+      PTTeamedUp: resObj.teamedUpParticipants
     });
     this.props.dispatch({ type: "load-event", eventObj: this.state.eventObj });
   };
@@ -34,7 +35,11 @@ class dash extends Component {
       <section>
         {/* if logged in as OG*/}
         {this.props.authStatus.type === "OG" && (
-          <OGDash eventObj={this.state.eventObj} PTTotal={this.state.PTTotal} />
+          <OGDash
+            eventObj={this.state.eventObj}
+            PTTotal={this.state.PTTotal}
+            PTTeamedUp={this.state.PTTeamedUp}
+          />
         )}
         {/* if logged in as PT*/}
         {this.props.authStatus.type === "PT" && (

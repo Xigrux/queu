@@ -300,6 +300,7 @@ app.post("/get-event", upload.none(), (req, res) => {
   let eventObject;
   let eventParticipants;
   let participantsTotal;
+  let teamedUpParticipants;
 
   dbo
     .collection("organizers")
@@ -315,8 +316,12 @@ app.post("/get-event", upload.none(), (req, res) => {
         .toArray((err, PTArr) => {
           eventParticipants = PTArr;
           participantsTotal = eventParticipants.length;
+          let teamedUpParticipants = PTArr.filter(participant => {
+            return participant.team !== null;
+          }).length;
+          console.log("teamed up", teamedUpParticipants);
 
-          resObj = { eventObject, participantsTotal };
+          resObj = { eventObject, participantsTotal, teamedUpParticipants };
           return res.send(JSON.stringify(resObj));
         });
     });
@@ -446,6 +451,7 @@ app.post("/updatecreds", upload.none(), async (req, res) => {
 app.post("/confirmation", upload.none(), (req, res) => {
   let PTresponse = JSON.parse(req.body.PTresponse);
   let participantID = req.body.participantID;
+
   console.log("in confirmation", PTresponse, participantID);
 
   dbo
@@ -460,67 +466,69 @@ app.post("/confirmation", upload.none(), (req, res) => {
           return memberStatus[member] === true;
         });
         if (allConfirmed) {
-          dbo
-            .collection("confirmedTeams")
-            .insertOne(
-              { teamID: team.value.teamID, team: team.value.team },
-              (err, fullTeam) => {
-                if (err) {
-                  return res.send(JSON.stringify({ success: false }));
-                }
+          dbo.collection("confirmedTeams").insertOne(
+            {
+              eventID: team.value.eventID,
+              teamID: team.value.teamID,
+              team: team.value.team
+            },
+            (err, fullTeam) => {
+              if (err) {
+                return res.send(JSON.stringify({ success: false }));
+              }
 
-                Object.keys(team.value.team).forEach(memberID => {
-                  dbo
-                    .collection("participants")
-                    .findOneAndUpdate(
-                      { participantID: memberID },
-                      { $set: { team: team.value.teamID } },
-                      (err, team) => {
-                        if (err) {
-                          return res.send(JSON.stringify({ success: false }));
-                        }
-                      }
-                    );
-                });
-
+              Object.keys(team.value.team).forEach(memberID => {
                 dbo
                   .collection("participants")
-                  .find({
-                    participantID: { $in: Object.keys(team.value.team) }
-                  })
-                  .toArray((err, memberList) => {
-                    memberList.forEach(member => {
-                      var mailOptions = {
-                        from: '"Queu" <from@example.com>',
-                        to: member.email,
-                        subject: "Your team is ready",
-                        html: "Your team is complete"
-                      };
-                      let sendIt = () => {
-                        transport.sendMail(mailOptions, (error, info) => {
-                          if (error) {
-                            return console.log(error);
-                          }
-                          console.log("Message sent: %s", info.messageId);
-                        });
-                        console.log([mailOptions.html]);
-                      };
-                      setTimeout(sendIt, 2000);
-                    });
-                  });
+                  .findOneAndUpdate(
+                    { participantID: memberID },
+                    { $set: { team: team.value.teamID } },
+                    (err, team) => {
+                      if (err) {
+                        return res.send(JSON.stringify({ success: false }));
+                      }
+                    }
+                  );
+              });
 
-                dbo
-                  .collection("pendingTeams")
-                  .deleteOne({ teamID: team.value.teamID }, (err, response) => {
-                    return res.send(
-                      JSON.stringify({
-                        success: true,
-                        isTeamComplete: true
-                      })
-                    );
+              dbo
+                .collection("participants")
+                .find({
+                  participantID: { $in: Object.keys(team.value.team) }
+                })
+                .toArray((err, memberList) => {
+                  memberList.forEach(member => {
+                    var mailOptions = {
+                      from: '"Queu" <from@example.com>',
+                      to: member.email,
+                      subject: "Your team is ready",
+                      html: "Your team is complete"
+                    };
+                    let sendIt = () => {
+                      transport.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                          return console.log(error);
+                        }
+                        console.log("Message sent: %s", info.messageId);
+                      });
+                      console.log([mailOptions.html]);
+                    };
+                    setTimeout(sendIt, 2000);
                   });
-              }
-            );
+                });
+
+              dbo
+                .collection("pendingTeams")
+                .deleteOne({ teamID: team.value.teamID }, (err, response) => {
+                  return res.send(
+                    JSON.stringify({
+                      success: true,
+                      isTeamComplete: true
+                    })
+                  );
+                });
+            }
+          );
         } else {
           return res.send(
             JSON.stringify({ success: true, isTeamComplete: false })
@@ -530,12 +538,13 @@ app.post("/confirmation", upload.none(), (req, res) => {
     );
 });
 
-app.get("/maketeam", (req, res) => {
+app.post("/maketeam", upload.none(), (req, res) => {
+  let eventID = req.body.eventID;
   dbo.collection("pendingTeams").deleteMany({}, (err, success) => {
     if (err) {
       res.send(err);
     }
-    console.log("cleared everything in pending teams");
+    console.log("cleared everything in pending teams", eventID);
 
     let PTCat = {
       mean: { design: [], frontend: [], backend: [] },
@@ -549,7 +558,7 @@ app.get("/maketeam", (req, res) => {
 
     dbo
       .collection("participants")
-      .find({ team: undefined })
+      .find({ team: undefined, eventID })
       .toArray((err, PTArr) => {
         PTArr.forEach(PT => {
           PT.stack.forEach(tech => {
@@ -558,6 +567,7 @@ app.get("/maketeam", (req, res) => {
             });
           });
         });
+        console.log(PTCat);
 
         // this chain pushes all potentials teams to potentialTeamsObj in [PTID]:teamID format
         let allStacks = Object.keys(PTCat);
@@ -567,33 +577,36 @@ app.get("/maketeam", (req, res) => {
           // navigate to a role array
           allRoles.forEach(role => {
             // pick a user at the a time
-            PTCat[stack][role].forEach(PT => {
+            PTCat[stack][role].forEach(PTchosen => {
               // check their desired teammate roles
-              PT.roleAssoc.forEach(desiredRole => {
+              PTchosen.roleAssoc.forEach(desiredRole => {
                 // got to the stack and role check through all the users in that role group
                 PTCat[stack][desiredRole].forEach(potentialTeammate => {
                   // check each user in role group's roleAssoc preference
                   potentialTeammate.roleAssoc.forEach(potentialRole => {
                     // make sure they qualify by ...
                     if (
-                      PT.role.includes(potentialRole) && // ... role criteria
-                      PT.size === potentialTeammate.size && // ... size criteria
-                      PT.participantID !== potentialTeammate.participantID && // ... not the same person
+                      PTchosen.role.includes(potentialRole) && // ... role criteria
+                      PTchosen.size === potentialTeammate.size && // ... size criteria
+                      PTchosen.participantID !==
+                        potentialTeammate.participantID && // ... not the same person
                       potentialTeammate.potentialTeam === undefined // ...incoming potential teammate has no team yet
                     ) {
                       // if control participant doesn't have team id, give them one
-                      if (PT.potentialTeam === undefined) {
+                      if (PTchosen.potentialTeam === undefined) {
                         let potentialTeamID = Math.random()
                           .toString(36)
                           .slice(-8);
-                        PT.potentialTeam = potentialTeamID;
-                        potentialTeamsObj[PT.participantID] = potentialTeamID;
+                        PTchosen.potentialTeam = potentialTeamID;
+                        potentialTeamsObj[
+                          PTchosen.participantID
+                        ] = potentialTeamID;
                       }
                       // check how many people are already tagged with the same teamID
                       let dupes = 0;
                       let allPTs = Object.keys(potentialTeamsObj);
                       allPTs.forEach(PPT => {
-                        if (potentialTeamsObj[PPT] === PT.potentialTeam) {
+                        if (potentialTeamsObj[PPT] === PTchosen.potentialTeam) {
                           dupes++;
                         } else {
                           return;
@@ -601,10 +614,11 @@ app.get("/maketeam", (req, res) => {
                       });
 
                       // make sure dupes respect team size criteria
-                      if (PT.size + 1 > dupes) {
-                        potentialTeammate.potentialTeam = PT.potentialTeam;
+                      if (PTchosen.size + 1 > dupes) {
+                        potentialTeammate.potentialTeam =
+                          PTchosen.potentialTeam;
                         potentialTeamsObj[potentialTeammate.participantID] =
-                          PT.potentialTeam;
+                          PTchosen.potentialTeam;
                       }
                     }
                   });
@@ -618,27 +632,29 @@ app.get("/maketeam", (req, res) => {
         let potentialTeamsArr = [];
 
         // this chain reorganizes potentialTeamsObj to {[teamID]:[PT,PT,PT}} format
-        allPTs.forEach(PT => {
-          let teamID = potentialTeamsObj[PT];
+        allPTs.forEach(PTID => {
+          let teamID = potentialTeamsObj[PTID];
           if (potentialTeamsArr.length === 0) {
             // if Arr is empty create first entry
             potentialTeamsArr.push({
-              teamID: teamID,
-              team: { [PT]: undefined }
+              teamID,
+              eventID,
+              team: { [PTID]: undefined }
             });
           } else {
             // depending if someone was adde to a team cause ID's matched, push the PT or create new team
             let addMember = false;
             potentialTeamsArr.forEach(team => {
               if (teamID === team.teamID) {
-                team.team[PT] = undefined;
+                team.team[PTID] = undefined;
                 addMember = true;
               }
             });
             if (!addMember) {
               potentialTeamsArr.push({
-                teamID: teamID,
-                team: { [PT]: undefined }
+                teamID,
+                eventID,
+                team: { [PTID]: undefined }
               });
             }
           }
@@ -728,9 +744,8 @@ app.get("/maketeam", (req, res) => {
               });
           });
         });
-
-        res.send("done");
       });
+    res.send("done");
   });
 });
 
