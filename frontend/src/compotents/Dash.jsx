@@ -14,7 +14,7 @@ class dash extends Component {
     };
   }
 
-  componentWillMount = async () => {
+  componentDidMount = async () => {
     // getting event data and passing to global state
     let data = new FormData();
     data.append("eventID", this.props.match.params.eventID);
@@ -27,7 +27,10 @@ class dash extends Component {
       PTTeamedUp: resObj.teamedUpParticipants,
       nbTeams: resObj.numberOfTeams
     });
-    this.props.dispatch({ type: "load-event", eventObj: this.state.eventObj });
+    this.props.dispatch({
+      type: "load-event",
+      eventObj: this.state.eventObj
+    });
   };
 
   render() {
@@ -55,7 +58,7 @@ class dash extends Component {
 }
 
 let propList = global => {
-  return { authStatus: global.authStatus };
+  return { authStatus: global.authStatus, eventObj: global.eventObj };
 };
 
 let Dash = connect(propList)(withRouter(dash));

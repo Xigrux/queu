@@ -9,11 +9,22 @@ let serviceAccount = require("./firebase-service-key.json");
 let firebase = require("firebase");
 let nodemailer = require("nodemailer");
 let TESTUSERS = require("./testusers.js");
+var cloudinary = require("cloudinary").v2;
 
 //=============================== INITIALIZE LIBRARIES ===============================//
 let app = express();
 
-let upload = multer();
+// SET STORAGE
+let storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, "uploads");
+  },
+  filename: function(req, file, cb) {
+    cb(null, file.fieldname + "-" + Date.now());
+  }
+});
+
+var upload = multer({ storage: storage });
 
 let rootPath = "http://localhost:8080";
 
@@ -55,6 +66,12 @@ var transport = nodemailer.createTransport({
     user: "michael.senger88@ethereal.email",
     pass: "dYyxrnptWEttVy8RK3"
   }
+});
+
+cloudinary.config({
+  cloud_name: "digodfjca",
+  api_key: "174129486649864",
+  api_secret: "_SMZ7OP7SWGWViHahB2iB3LkUUE"
 });
 
 //=============================== ALGO ===============================//
@@ -262,6 +279,8 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
   let password = req.body.password;
   let maxTeamSize = req.body.maxTeamSize;
   let eventID;
+  let imagePath = req.body.imagePath;
+
   admin
     .auth()
     .createUser({
@@ -278,13 +297,15 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
           eventID,
           event,
           email,
-          maxTeamSize
+          maxTeamSize,
+          imagePath
         },
-        (err, organizer) => {
+        (err, eventObj) => {
           if (err) {
+            console.log("errored in CAQ", err);
             return res.send(JSON.stringify({ success: false }));
           }
-          return res.send(JSON.stringify(eventID));
+          return res.send(JSON.stringify(eventObj.ops[0]));
         }
       );
 
@@ -296,6 +317,7 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
 });
 
 app.post("/get-event", upload.none(), (req, res) => {
+  console.log("in get event");
   let eventID = req.body.eventID;
   let eventObject;
   let eventParticipants;
@@ -761,6 +783,12 @@ app.post("/maketeam", upload.none(), (req, res) => {
       });
     res.send("done");
   });
+});
+
+app.post("/image-upload", upload.single("image"), (req, res) => {
+  console.log(req.file);
+
+  cloudinary.uploader.upload(req.file.path).then(image => res.json([image]));
 });
 
 //=============================== LISTENER ===============================//
