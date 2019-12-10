@@ -280,6 +280,8 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
   let maxTeamSize = req.body.maxTeamSize;
   let eventID;
   let imagePath = req.body.imagePath;
+  let background = req.body.background;
+  let font = req.body.font;
 
   admin
     .auth()
@@ -298,7 +300,9 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
           event,
           email,
           maxTeamSize,
-          imagePath
+          imagePath,
+          background,
+          font
         },
         (err, eventObj) => {
           if (err) {

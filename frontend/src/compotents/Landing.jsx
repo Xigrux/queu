@@ -29,7 +29,12 @@ class landing extends Component {
   render() {
     if (this.props.match.params.eventID) {
       return (
-        <section>
+        <section
+          style={{
+            backgroundColor: this.state.eventObj.background,
+            color: this.state.eventObj.font
+          }}
+        >
           Going to <b>{this.state.eventObj.event}</b> but don't have a team?
           <img src={this.state.eventObj.imagePath} alt=""></img>
           Sign up as a participant here

@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import Spinner from "./UI/Spinner";
 import Image from "./UI/Image";
 import Button from "./UI/Button";
+import { ChromePicker } from "react-color";
 
 class caq extends Component {
   constructor(props) {
@@ -16,7 +17,9 @@ class caq extends Component {
         email: undefined,
         password: undefined,
         maxTeamSize: undefined,
-        imagePath: undefined
+        imagePath: undefined,
+        background: "#fff",
+        font: "#333"
       }
     };
   }
@@ -89,11 +92,18 @@ class caq extends Component {
     });
   };
 
+  handleChangeBG = color => {
+    this.setState({ inputs: { ...this.state.inputs, background: color.hex } });
+  };
+
+  handleChangeFont = color => {
+    this.setState({ inputs: { ...this.state.inputs, font: color.hex } });
+  };
+
   render() {
     let uploading = this.state.uploading;
     let image = this.state.image;
-
-    console.log(image);
+    console.log(this.state);
 
     let content = () => {
       if (uploading) {
@@ -126,14 +136,31 @@ class caq extends Component {
             name="password"
             placeholder="password"
           ></input>
-
-          <div className="buttons">{content()}</div>
           <input
             onChange={this.handleInput}
             type="number"
             name="maxTeamSize"
             placeholder="max team size"
           ></input>
+          <div className="buttons">{content()}</div>
+          <div
+            style={{
+              backgroundColor: this.state.inputs.background,
+              color: this.state.inputs.font
+            }}
+          >
+            font
+          </div>
+          <ChromePicker
+            disableAlpha={true}
+            color={this.state.inputs.background}
+            onChangeComplete={this.handleChangeBG}
+          />
+          <ChromePicker
+            disableAlpha={true}
+            color={this.state.inputs.font}
+            onChangeComplete={this.handleChangeFont}
+          />
           <button type="submit">Create my Queu</button>
         </form>
       </section>
