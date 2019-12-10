@@ -24,8 +24,16 @@ class ogdash extends Component {
           here's the link you can send :{" "}
           {window.location.origin + "/" + this.props.eventObj.eventID}
         </div>
-        <div>there are {this.props.PTTotal} participants</div>
-        <div>there are {this.props.PTTeamedUp} are teamed up</div>
+        <div>
+          there are {this.props.PTTotal}{" "}
+          {this.props.PTTotal > 1 ? "participants" : "participant"}
+        </div>
+        <div>
+          there are {this.props.PTTeamedUp}{" "}
+          {this.props.PTTeamedUp > 1 ? "participants" : "participant"} who are
+          teamed up into {this.props.nbTeams}{" "}
+          {this.props.nbTeams > 1 ? "teams" : "team"}
+        </div>
         <button onClick={this.makeTeam}>Quen in teams</button>
       </section>
     );

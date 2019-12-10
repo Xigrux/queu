@@ -24,7 +24,8 @@ class dash extends Component {
     this.setState({
       eventObj: resObj.eventObject,
       PTTotal: resObj.participantsTotal,
-      PTTeamedUp: resObj.teamedUpParticipants
+      PTTeamedUp: resObj.teamedUpParticipants,
+      nbTeams: resObj.numberOfTeams
     });
     this.props.dispatch({ type: "load-event", eventObj: this.state.eventObj });
   };
@@ -39,6 +40,7 @@ class dash extends Component {
             eventObj={this.state.eventObj}
             PTTotal={this.state.PTTotal}
             PTTeamedUp={this.state.PTTeamedUp}
+            nbTeams={this.state.nbTeams}
           />
         )}
         {/* if logged in as PT*/}

@@ -301,6 +301,7 @@ app.post("/get-event", upload.none(), (req, res) => {
   let eventParticipants;
   let participantsTotal;
   let teamedUpParticipants;
+  let numberOfTeams;
 
   dbo
     .collection("organizers")
@@ -319,10 +320,23 @@ app.post("/get-event", upload.none(), (req, res) => {
           let teamedUpParticipants = PTArr.filter(participant => {
             return participant.team !== null;
           }).length;
-          console.log("teamed up", teamedUpParticipants);
 
-          resObj = { eventObject, participantsTotal, teamedUpParticipants };
-          return res.send(JSON.stringify(resObj));
+          dbo
+            .collection("confirmedTeams")
+            .find({ eventID: eventObject.eventID })
+            .toArray((err, teams) => {
+              numberOfTeams = teams.length;
+
+              console.log("teamed up", teamedUpParticipants);
+
+              resObj = {
+                eventObject,
+                participantsTotal,
+                teamedUpParticipants,
+                numberOfTeams
+              };
+              return res.send(JSON.stringify(resObj));
+            });
         });
     });
 });
