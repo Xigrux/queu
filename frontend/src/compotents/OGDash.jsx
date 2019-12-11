@@ -2,6 +2,16 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 
 class ogdash extends Component {
+  componentWillMount = async () => {
+    document.documentElement.style.setProperty(
+      "--bg-color",
+      this.props.eventObj.background
+    );
+    document.documentElement.style.setProperty(
+      "--font-color",
+      this.props.eventObj.font
+    );
+  };
   makeTeam = async e => {
     console.log("clicked, gonna run algo");
     e.preventDefault();
@@ -40,8 +50,8 @@ class ogdash extends Component {
   }
 }
 
-let propList = () => {
-  return {};
+let propList = globalState => {
+  return { eventObj: globalState.eventObj };
 };
 
 let OGDash = connect(propList)(ogdash);

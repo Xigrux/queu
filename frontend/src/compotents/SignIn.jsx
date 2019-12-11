@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
+import "../styles/signin.css";
+import { FiXCircle } from "react-icons/fi";
 
 class signin extends Component {
   constructor(props) {
@@ -11,10 +13,35 @@ class signin extends Component {
     };
   }
 
-  componentWillMount = async () => {
+  componentDidMount = async () => {
     console.log("here");
-    console.log(this.props);
-    this.setState({ email: this.props.match.params.paticipantEmail });
+
+    let wildCards = this.props.location.pathname.split("/").splice(2, 2);
+    let eventID = wildCards[0];
+    let email = wildCards[1];
+
+    if (eventID && email) {
+      let data = new FormData();
+      data.append("eventID", eventID);
+      let response = await fetch("/get-event", { method: "POST", body: data });
+      let resBody = await response.text();
+      let resObj = JSON.parse(resBody);
+      document.getElementById("signIn").classList += " open";
+      this.setState({ email });
+      this.setState({
+        eventObj: resObj.eventObject
+      });
+      this.props.dispatch({ type: "load-event", eventObj: resObj.eventObject });
+
+      document.documentElement.style.setProperty(
+        "--bg-color",
+        this.state.eventObj.background
+      );
+      document.documentElement.style.setProperty(
+        "--font-color",
+        this.state.eventObj.font
+      );
+    }
   };
 
   handleInput = e => {
@@ -61,30 +88,46 @@ class signin extends Component {
         type: "login",
         authStatus: { type: "OG", isLoggedIn: true }
       });
+      document.getElementById("modal").classList = "";
+      document.getElementById("signIn").classList = "nav-modal";
       return this.props.history.push("/" + userData.eventID);
     }
   };
 
+  closeModal = e => {
+    e.preventDefault();
+    document.getElementById("modal").classList = "";
+    document.getElementById("signIn").classList = "nav-modal";
+  };
+
   render() {
     return (
-      <section>
-        <form onSubmit={this.signin}>
+      <div class="signin-toast">
+        <form
+          class="signin-form flex-dir-v flex-container flex-center-h flex-center-v"
+          onSubmit={this.signin}
+        >
           <input
             onChange={this.handleInput}
             type="text"
             name="email"
-            placeholder="email"
+            id="email"
             value={this.state.email === undefined ? "" : this.state.email}
           ></input>
+          <label for="email">Email</label>
           <input
             onChange={this.handleInput}
             type="text"
             name="password"
-            placeholder="password"
+            id="password"
           ></input>
+          <label for="password">Password</label>
           <button type="submit">Sign in</button>
         </form>
-      </section>
+        <div class="signin-close" onClick={this.closeModal}>
+          <FiXCircle />
+        </div>
+      </div>
     );
   }
 }

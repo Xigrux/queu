@@ -19,29 +19,30 @@ class app extends Component {
             isLoggedIn={this.props.authStatus.isLoggedIn}
             userType={this.props.authStatus.type}
           ></Nav>
+          <div class="blur">
+            <Route path="/" exact={true}>
+              <Landing />
+            </Route>
 
-          <Route path="/" exact={true}>
-            <Landing />
-          </Route>
+            {/* renders for root page */}
+            <Route path="/:eventID" exact={true}>
+              {/* if no logged in */}
+              {!this.props.authStatus.isLoggedIn && <Landing />}
+              {/* if logged in */}
+              {this.props.authStatus.isLoggedIn && <Dash />}
+            </Route>
 
-          {/* renders for root page */}
-          <Route path="/:eventID" exact={true}>
-            {/* if no logged in */}
-            {!this.props.authStatus.isLoggedIn && <Landing />}
-            {/* if logged in */}
-            {this.props.authStatus.isLoggedIn && <Dash />}
-          </Route>
+            <Route path="email/:eventID/:paticipantEmail" exact={true}>
+              {/* if no logged in */}
+              {!this.props.authStatus.isLoggedIn && <SignIn />}
+              {/* if logged in */}
+              {this.props.authStatus.isLoggedIn && <Dash />}
+            </Route>
 
-          <Route path="/event/create-a-queu" exact={true}>
-            <CAQ />
-          </Route>
-
-          <Route path="/:eventID/:paticipantEmail" exact={true}>
-            {/* if no logged in */}
-            {!this.props.authStatus.isLoggedIn && <SignIn />}
-            {/* if logged in */}
-            {this.props.authStatus.isLoggedIn && <Dash />}
-          </Route>
+            <Route path="/event/create-a-queu" exact={true}>
+              <CAQ />
+            </Route>
+          </div>
         </BrowserRouter>
         <Footer></Footer>
       </>

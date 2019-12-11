@@ -1,3 +1,45 @@
 nav {
-  background-color: red;
+  background-color: transparent;
+  height: 50px;
+  width: 100%;
+  padding: 10px 5vw;
+}
+
+.nav-logo {
+  width: 33px;
+  height: 33px;
+  background-image: url("/img/logo.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--bg-color);
+  background-blend-mode: luminosity;
+  margin-left: 30px;
+}
+
+body.modal-open .blur {
+  filter: blur(5px);
+}
+
+.nav-modal {
+  position: absolute;
+  height: 0;
+  width: 0;
+  top: 0;
+  left: 0;
+  background-color: #333333dd;
+
+  transition: 500ms ease all;
+  opacity: 0;
+}
+
+.nav-modal.open {
+  height: 100vh;
+  width: 100vw;
+  opacity: 1;
+  z-index: 10;
+}
+
+.nav-button {
+  margin-left: 15px;
 }

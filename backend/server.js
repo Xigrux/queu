@@ -396,7 +396,7 @@ app.post("/signin", upload.none(), (req, res) => {
         });
     })
     .catch(err => {
-      console.log("Caught error");
+      console.log("Caught error", err);
       return res.send(JSON.stringify({ success: false }));
     });
 });
@@ -739,7 +739,12 @@ app.post("/maketeam", upload.none(), (req, res) => {
                     }
                   });
 
-                  return [ppt.email, ppt.username, teammates.join("<br>")];
+                  return [
+                    ppt.email,
+                    ppt.username,
+                    teammates.join("<br>"),
+                    ppt.eventID
+                  ];
                 });
 
                 teamInfos.forEach(member => {
@@ -757,7 +762,9 @@ app.post("/maketeam", upload.none(), (req, res) => {
                       member[2] +
                       "</ul>Start chatting away and if you're happy with your team <a href='" +
                       rootPath +
-                      "/user/signin/" +
+                      "/email/" +
+                      member[3] +
+                      "/" +
                       member[0] +
                       "' target='_blank'>login</a> to confirm your spot"
                     // <img src="cid:uniq-mailtrap.png" alt="mailtrap" />

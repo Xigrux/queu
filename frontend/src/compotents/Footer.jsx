@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 
 class footer extends Component {
   render() {
-    return <footer>footer</footer>;
+    return <footer class="blur">footer</footer>;
   }
 }
 

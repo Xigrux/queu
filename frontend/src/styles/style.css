@@ -1,3 +1,8 @@
+:root {
+  --bg-color: white;
+  --font-color: #650cbb;
+}
+
 * {
   box-sizing: border-box;
   -webkit-touch-callout: none;
@@ -9,7 +14,10 @@
 }
 
 body {
-  background-color: #f6f6f6;
+  background-color: var(--bg-color);
+  color: var(--font-color);
+
+  font-family: "Heebo", sans-serif;
 }
 
 a {
@@ -20,6 +28,7 @@ a {
   -ms-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  color: var(--font-color);
 }
 
 #root {
@@ -78,6 +87,7 @@ a {
 }
 
 button {
+  /* reset */
   padding: 0;
   -webkit-appearance: none;
   -webkit-writing-mode: unset !important;
@@ -88,6 +98,17 @@ button {
   border-style: unset;
   border-color: unset;
   border-image: unset;
+
+  /* custom */
+  padding: 8px 10px 6px;
+  border-radius: 100px;
+  transition: 200ms ease all;
+  font-weight: 700;
+}
+
+button:hover {
+  box-shadow: 0 1px 4px #33333333;
+  border-radius: 100px;
 }
 
 input {
@@ -119,6 +140,15 @@ input[type="number"]::-webkit-outer-spin-button {
   opacity: 1;
 }
 
+input:focus + label,
+input:not(:placeholder-shown) + label {
+  margin-top: -2em;
+  -webkit-transform-origin: left;
+  transform-origin: left;
+  -webkit-transform: scale(0.7);
+  transform: scale(0.7);
+}
+
 section {
   padding: 1vw;
 }
@@ -142,9 +172,4 @@ section {
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent; /* make scrollbar transparent */
-}
-
-.explicit-link {
-  border-bottom: 1px dotted #000;
-  text-decoration: none;
 }

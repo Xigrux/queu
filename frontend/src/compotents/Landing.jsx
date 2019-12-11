@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import PTRegistration from "./PTRegistration";
+import "../styles/landing.css";
 
 class landing extends Component {
   constructor(props) {
@@ -24,6 +25,15 @@ class landing extends Component {
         eventObj: resObj.eventObject
       });
       this.props.dispatch({ type: "load-event", eventObj: resObj.eventObject });
+
+      document.documentElement.style.setProperty(
+        "--bg-color",
+        this.state.eventObj.background
+      );
+      document.documentElement.style.setProperty(
+        "--font-color",
+        this.state.eventObj.font
+      );
     }
   };
 
@@ -31,10 +41,10 @@ class landing extends Component {
     if (this.props.match.params.eventID) {
       return (
         <section
-          style={{
-            backgroundColor: this.state.eventObj.background,
-            color: this.state.eventObj.font
-          }}
+        // style={{
+        //   backgroundColor: this.state.eventObj.background,
+        //   color: this.state.eventObj.font
+        // }}
         >
           Going to <b>{this.state.eventObj.event}</b> but don't have a team?
           <img src={this.state.eventObj.imagePath} alt=""></img>
@@ -46,7 +56,7 @@ class landing extends Component {
         </section>
       );
     } else {
-      return <section>welcome to queu</section>;
+      return <section class="landing-not-loggedIn">welcome to queu</section>;
     }
   }
 }
