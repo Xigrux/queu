@@ -36,12 +36,11 @@ class app extends Component {
             <CAQ />
           </Route>
 
-          <Route path="/user/signin" exact={true}>
-            <SignIn />
-          </Route>
-
-          <Route path="/user/signin/:paticipantEmail" exact={true}>
-            <SignIn />
+          <Route path="/:eventID/:paticipantEmail" exact={true}>
+            {/* if no logged in */}
+            {!this.props.authStatus.isLoggedIn && <SignIn />}
+            {/* if logged in */}
+            {this.props.authStatus.isLoggedIn && <Dash />}
           </Route>
         </BrowserRouter>
         <Footer></Footer>

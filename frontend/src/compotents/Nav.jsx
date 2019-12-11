@@ -1,8 +1,13 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
+import SignIn from "./SignIn";
+import "../styles/nav.css";
 
 class nav extends Component {
+  componentDidMount = () => {
+    console.log(this.props);
+  };
   logout = async () => {
     let response = await fetch("/logout");
     let resBody = await response.text();
@@ -18,9 +23,9 @@ class nav extends Component {
             <Link to="/event/create-a-queu">
               <button>Create a Queu for my event</button>
             </Link>
-            <Link to="/user/signin">
-              <button>Sign In</button>
-            </Link>
+
+            <button>Sign In</button>
+            <SignIn />
           </span>
         )}
 
@@ -42,6 +47,6 @@ let propList = () => {
   return {};
 };
 
-let Nav = connect()(nav);
+let Nav = connect()(withRouter(nav));
 
 export default Nav;

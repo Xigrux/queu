@@ -1,0 +1,150 @@
+* {
+  box-sizing: border-box;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+body {
+  background-color: #f6f6f6;
+}
+
+a {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  width: 100vw;
+}
+.flex-container {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-dir-h {
+  flex-direction: row;
+}
+
+.flex-dir-v {
+  flex-direction: column;
+}
+
+.flex-center-h {
+  justify-content: center;
+}
+
+.flex-between-h {
+  justify-content: space-between;
+}
+
+.flex-evenly-h {
+  justify-content: space-evenly;
+}
+
+.flex-around-h {
+  justify-content: space-around;
+}
+
+.flex-end-h {
+  justify-content: flex-end;
+}
+
+.flex-center-v {
+  align-items: center;
+}
+
+.flex-end-v {
+  align-items: flex-end;
+}
+
+.flex-stretch-v {
+  align-items: stretch;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 0;
+  -webkit-appearance: none;
+  -webkit-writing-mode: unset !important;
+  color: unset;
+  background-color: unset;
+  cursor: pointer;
+  border-width: unset;
+  border-style: unset;
+  border-color: unset;
+  border-image: unset;
+}
+
+input {
+  /* reset */
+  -webkit-writing-mode: unset !important;
+  color: initial;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-transform: none;
+  background-color: unset;
+  cursor: text;
+  border-width: unset;
+  border-style: unset;
+  border-color: unset;
+  border-image: unset;
+  border-radius: unset;
+  -webkit-touch-callout: all;
+  -webkit-user-select: all;
+  -khtml-user-select: all;
+  -moz-user-select: all;
+  -ms-user-select: all;
+  user-select: all;
+
+  /* custom */
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+section {
+  padding: 1vw;
+}
+
+.ellipsis {
+  text-overflow: ellipsis;
+
+  /* Required for text-overflow to do anything */
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+*:focus {
+  outline: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* make scrollbar transparent */
+}
+
+.explicit-link {
+  border-bottom: 1px dotted #000;
+  text-decoration: none;
+}
