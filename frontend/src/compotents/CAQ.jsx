@@ -5,6 +5,7 @@ import Spinner from "./UI/Spinner";
 import Image from "./UI/Image";
 import Button from "./UI/Button";
 import { ChromePicker } from "react-color";
+import "../styles/caq.css";
 
 class caq extends Component {
   constructor(props) {
@@ -94,10 +95,13 @@ class caq extends Component {
 
   handleChangeBG = color => {
     this.setState({ inputs: { ...this.state.inputs, background: color.hex } });
+
+    document.documentElement.style.setProperty("--bg-color", color.hex);
   };
 
   handleChangeFont = color => {
     this.setState({ inputs: { ...this.state.inputs, font: color.hex } });
+    document.documentElement.style.setProperty("--font-color", color.hex);
   };
 
   render() {
@@ -116,51 +120,74 @@ class caq extends Component {
     };
 
     return (
-      <section>
-        <form onSubmit={this.createQueu}>
-          <input
-            onChange={this.handleInput}
-            type="text"
-            name="event"
-            placeholder="event"
-          ></input>
-          <input
-            onChange={this.handleInput}
-            type="text"
-            name="email"
-            placeholder="email"
-          ></input>
-          <input
-            onChange={this.handleInput}
-            type="text"
-            name="password"
-            placeholder="password"
-          ></input>
-          <input
-            onChange={this.handleInput}
-            type="number"
-            name="maxTeamSize"
-            placeholder="max team size"
-          ></input>
-          <div className="buttons">{content()}</div>
-          <div
-            style={{
-              backgroundColor: this.state.inputs.background,
-              color: this.state.inputs.font
-            }}
-          >
-            font
-          </div>
-          <ChromePicker
-            disableAlpha={true}
-            color={this.state.inputs.background}
-            onChangeComplete={this.handleChangeBG}
-          />
-          <ChromePicker
-            disableAlpha={true}
-            color={this.state.inputs.font}
-            onChangeComplete={this.handleChangeFont}
-          />
+      <section class="fullVwidth">
+        <form
+          class="caq-form fullPwidth flex-container flex-center-v flex-dir-v"
+          onSubmit={this.createQueu}
+        >
+          <section class="caq-section flex-container flex-center-h">
+            <div>Accound setup</div>
+            <div class="input-label-container">
+              <input
+                onChange={this.handleInput}
+                type="text"
+                name="event"
+                placeholder=" "
+                id="caq-event"
+                required
+              ></input>
+              <label for="caq-event">Event Name</label>
+            </div>
+            <div class="input-label-container">
+              <input
+                onChange={this.handleInput}
+                type="text"
+                name="email"
+                placeholder=" "
+                id="caq-email"
+                required
+              ></input>
+              <label for="caq-email">Contact Email</label>
+            </div>
+            <div class="input-label-container">
+              <input
+                onChange={this.handleInput}
+                type="text"
+                name="password"
+                placeholder=" "
+                id="caq-password"
+                required
+              ></input>
+              <label for="caq-password">Password</label>
+            </div>
+            <div class="input-label-container">
+              <input
+                onChange={this.handleInput}
+                type="number"
+                name="maxTeamSize"
+                placeholder=" "
+                id="caq-team"
+                required
+              ></input>
+              <label for="caq-team">Max team size</label>
+            </div>
+          </section>
+          <section class="caq-section flex-container flex-center-h">
+            <div>Customize your Queu</div>
+            <div className="buttons">{content()}</div>
+            <ChromePicker
+              disableAlpha={true}
+              color={this.state.inputs.background}
+              onChangeComplete={this.handleChangeBG}
+              required
+            />
+            <ChromePicker
+              disableAlpha={true}
+              color={this.state.inputs.font}
+              onChangeComplete={this.handleChangeFont}
+              required
+            />
+          </section>
           <button type="submit">Create my Queu</button>
         </form>
       </section>

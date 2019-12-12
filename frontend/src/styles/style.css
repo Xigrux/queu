@@ -16,7 +16,7 @@
 body {
   background-color: var(--bg-color);
   color: var(--font-color);
-
+  transition: 300ms ease all;
   font-family: "Heebo", sans-serif;
 }
 
@@ -31,9 +31,15 @@ a {
   color: var(--font-color);
 }
 
-#root {
+#root,
+.fullVwidth {
   width: 100vw;
 }
+
+.fullPwidth {
+  width: 100%;
+}
+
 .flex-container {
   display: flex;
 }
@@ -107,7 +113,7 @@ button {
 }
 
 button:hover {
-  box-shadow: 0 1px 4px #33333333;
+  box-shadow: 0 1px 4px #00000033;
   border-radius: 100px;
 }
 
@@ -133,20 +139,47 @@ input {
   user-select: all;
 
   /* custom */
+  position: relative;
+  height: 20px;
+  width: 100%;
+  border-bottom: 1px var(--font-color) solid;
+  margin: 5px 0;
+  transform-origin: left;
+  transform: scale(1);
+  color: var(--font-color);
+  background-color: var(--bg-color);
+  font-weight: 700;
+  transition: 100ms ease all;
+}
+.input-label-container {
+  position: relative;
+  height: 40px;
+  width: 200px;
+  margin: 12px 0;
+}
+
+label {
+  transition: 200ms ease all;
+  position: absolute;
+  left: 0;
+}
+
+input:focus,
+input:hover {
+  background-color: #f3f3f3;
+  color: #333;
+}
+
+input:focus + label,
+input:not(:placeholder-shown) + label {
+  margin-top: -20px;
+  transform-origin: left;
+  transform: scale(0.7);
 }
 
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   opacity: 1;
-}
-
-input:focus + label,
-input:not(:placeholder-shown) + label {
-  margin-top: -2em;
-  -webkit-transform-origin: left;
-  transform-origin: left;
-  -webkit-transform: scale(0.7);
-  transform: scale(0.7);
 }
 
 section {

@@ -107,21 +107,28 @@ class signin extends Component {
           class="signin-form flex-dir-v flex-container flex-center-h flex-center-v"
           onSubmit={this.signin}
         >
-          <input
-            onChange={this.handleInput}
-            type="text"
-            name="email"
-            id="email"
-            value={this.state.email === undefined ? "" : this.state.email}
-          ></input>
-          <label for="email">Email</label>
-          <input
-            onChange={this.handleInput}
-            type="text"
-            name="password"
-            id="password"
-          ></input>
-          <label for="password">Password</label>
+          <div class="input-label-container">
+            <input
+              onChange={this.handleInput}
+              type="text"
+              name="email"
+              id="email"
+              placeholder=" "
+              value={this.state.email === undefined ? "" : this.state.email}
+            ></input>
+            <label for="email">Email</label>
+          </div>
+          <div class="input-label-container">
+            <input
+              onChange={this.handleInput}
+              type="text"
+              name="password"
+              id="password"
+              placeholder=" "
+            ></input>
+            <label for="password">Password</label>
+          </div>
+
           <button type="submit">Sign in</button>
         </form>
         <div class="signin-close" onClick={this.closeModal}>
