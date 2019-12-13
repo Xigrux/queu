@@ -1,4 +1,12 @@
 .caq-section {
   width: 80%;
-  background-color: red;
+  background-color: #00000002;
+  margin: 2vw;
+  border-radius: 4px;
+  box-shadow: 0 0 5px #00000033;
+  padding: 5vw;
+}
+
+.chrome-picker {
+  display: none;
 }

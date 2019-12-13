@@ -125,68 +125,74 @@ class caq extends Component {
           class="caq-form fullPwidth flex-container flex-center-v flex-dir-v"
           onSubmit={this.createQueu}
         >
-          <section class="caq-section flex-container flex-center-h">
+          <section class="caq-section">
             <div>Accound setup</div>
-            <div class="input-label-container">
-              <input
-                onChange={this.handleInput}
-                type="text"
-                name="event"
-                placeholder=" "
-                id="caq-event"
-                required
-              ></input>
-              <label for="caq-event">Event Name</label>
-            </div>
-            <div class="input-label-container">
-              <input
-                onChange={this.handleInput}
-                type="text"
-                name="email"
-                placeholder=" "
-                id="caq-email"
-                required
-              ></input>
-              <label for="caq-email">Contact Email</label>
-            </div>
-            <div class="input-label-container">
-              <input
-                onChange={this.handleInput}
-                type="text"
-                name="password"
-                placeholder=" "
-                id="caq-password"
-                required
-              ></input>
-              <label for="caq-password">Password</label>
-            </div>
-            <div class="input-label-container">
-              <input
-                onChange={this.handleInput}
-                type="number"
-                name="maxTeamSize"
-                placeholder=" "
-                id="caq-team"
-                required
-              ></input>
-              <label for="caq-team">Max team size</label>
+            <div class="flex-container flex-center-h">
+              <div class="input-label-container">
+                <input
+                  onChange={this.handleInput}
+                  type="text"
+                  name="event"
+                  placeholder=" "
+                  id="caq-event"
+                  required
+                ></input>
+                <label for="caq-event">Event Name</label>
+              </div>
+              <div class="input-label-container">
+                <input
+                  onChange={this.handleInput}
+                  type="text"
+                  name="email"
+                  placeholder=" "
+                  id="caq-email"
+                  required
+                ></input>
+                <label for="caq-email">Contact Email</label>
+              </div>
+              <div class="input-label-container">
+                <input
+                  onChange={this.handleInput}
+                  type="text"
+                  name="password"
+                  placeholder=" "
+                  id="caq-password"
+                  required
+                ></input>
+                <label for="caq-password">Password</label>
+              </div>
+              <div class="input-label-container">
+                <input
+                  onChange={this.handleInput}
+                  type="number"
+                  name="maxTeamSize"
+                  placeholder=" "
+                  id="caq-team"
+                  required
+                ></input>
+                <label for="caq-team">Max team size</label>
+              </div>
             </div>
           </section>
-          <section class="caq-section flex-container flex-center-h">
-            <div>Customize your Queu</div>
-            <div className="buttons">{content()}</div>
-            <ChromePicker
-              disableAlpha={true}
-              color={this.state.inputs.background}
-              onChangeComplete={this.handleChangeBG}
-              required
-            />
-            <ChromePicker
-              disableAlpha={true}
-              color={this.state.inputs.font}
-              onChangeComplete={this.handleChangeFont}
-              required
-            />
+          <section class="caq-section">
+            <button>Customize your Queu</button>
+            <div class="flex-container flex-center-h">
+              <div className="buttons">{content()}</div>
+              <button>Background</button>
+              <ChromePicker
+                disableAlpha={true}
+                color={this.state.inputs.background}
+                onChangeComplete={this.handleChangeBG}
+                required
+              />
+              <button>Font</button>
+              <ChromePicker
+                disableAlpha={true}
+                color={this.state.inputs.font}
+                onChangeComplete={this.handleChangeFont}
+                required
+              />
+            </div>
           </section>
           <button type="submit">Create my Queu</button>
         </form>

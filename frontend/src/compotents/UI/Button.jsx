@@ -7,7 +7,13 @@ export default props => (
       <label htmlFor="single">
         <FiImage />
       </label>
-      <input type="file" name="image" id="single" onChange={props.onChange} />
+      <input
+        type="file"
+        name="image"
+        id="single"
+        onChange={props.onChange}
+        hidden
+      />
     </div>
   </div>
 );
