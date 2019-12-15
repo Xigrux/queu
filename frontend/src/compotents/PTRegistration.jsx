@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
+import "../styles/ptr.css";
 
 class ptregistration extends Component {
   constructor(props) {
@@ -65,115 +66,203 @@ class ptregistration extends Component {
 
   render() {
     return (
-      <section>
-        <form onSubmit={this.register}>
-          <input
-            type="text"
-            onChange={this.handleInput}
-            name="username"
-            placeholder="username"
-            required
-          />
-
-          <input
-            type="text"
-            onChange={this.handleInput}
-            name="email"
-            placeholder="email"
-            required
-          />
-
-          <input
-            type="text"
-            onChange={this.handleInput}
-            name="password"
-            placeholder="password"
-            required
-          />
-
-          <input
-            type="text"
-            onChange={this.handleInput}
-            name="messenger"
-            placeholder="messenger"
-            required
-          />
-
-          <label>role</label>
-          <div onChange={this.handleInput}>
-            <label htmlFor="pt-design">Design</label>
-            <input name="role" value="design" id="pt-design" type="checkbox" />
-            <label htmlFor="pt-frontend">Frontend</label>
-            <input
-              name="role"
-              value="frontend"
-              id="pt-frontend"
-              type="checkbox"
-            />
-            <label htmlFor="pt-backend">Backend</label>
-            <input
-              name="role"
-              value="backend"
-              id="pt-backend"
-              type="checkbox"
-            />
+      <>
+        <form onSubmit={this.register} class="flex-container flex-dir-v">
+          <div class="flex-container">
+            <section class="ptr-section">
+              <h1>Accound setup</h1>
+              <div class="input-label-container">
+                <input
+                  type="text"
+                  onChange={this.handleInput}
+                  name="username"
+                  placeholder=" "
+                  id="PTR-username"
+                  required
+                />
+                <label for="PTR-username">Username</label>
+              </div>
+              <div class="input-label-container">
+                <input
+                  type="text"
+                  onChange={this.handleInput}
+                  name="email"
+                  placeholder=" "
+                  id="PTR-email"
+                  required
+                />
+                <label for="PTR-email">Email</label>
+              </div>
+              <div class="input-label-container">
+                <input
+                  type="text"
+                  onChange={this.handleInput}
+                  name="password"
+                  placeholder=" "
+                  id="PTR-password"
+                  required
+                />
+                <label for="PTR-password">Password</label>
+              </div>
+              <div class="input-label-container">
+                <input
+                  type="text"
+                  onChange={this.handleInput}
+                  name="messenger"
+                  placeholder=" "
+                  id="PTR-messenger"
+                  required
+                />
+                <label for="PTR-messenger">Messenger Handle</label>
+              </div>
+            </section>
+            <section class="ptr-section">
+              <h1>Participant Detail</h1>
+              <h5>Role</h5>
+              <div class="flex-container" onChange={this.handleInput}>
+                <div class="input-label-container-check">
+                  <label htmlFor="pt-design">Design</label>
+                  <input
+                    name="role"
+                    value="design"
+                    id="pt-design"
+                    type="checkbox"
+                  />
+                </div>
+                <div class="input-label-container-check">
+                  <label htmlFor="pt-frontend">Frontend</label>
+                  <input
+                    name="role"
+                    value="frontend"
+                    id="pt-frontend"
+                    type="checkbox"
+                  />
+                </div>
+                <div class="input-label-container-check">
+                  <label htmlFor="pt-backend">Backend</label>
+                  <input
+                    name="role"
+                    value="backend"
+                    id="pt-backend"
+                    type="checkbox"
+                  />
+                </div>
+              </div>
+              <h5>Stack</h5>
+              <div class="flex-container" onChange={this.handleInput}>
+                <div class="input-label-container-check">
+                  <label htmlFor="pt-mean">MEAN</label>
+                  <input
+                    name="stack"
+                    value="mean"
+                    id="pt-mean"
+                    type="checkbox"
+                  />
+                </div>
+                <div class="input-label-container-check">
+                  <label htmlFor="pt-mern">MERN</label>
+                  <input
+                    name="stack"
+                    value="mern"
+                    id="pt-mern"
+                    type="checkbox"
+                  />
+                </div>
+                <div class="input-label-container-check">
+                  <label htmlFor="pt-python">Python Django</label>
+                  <input
+                    name="stack"
+                    value="python"
+                    id="pt-python"
+                    type="checkbox"
+                  />
+                </div>
+                <div class="input-label-container-check">
+                  <label htmlFor="pt-lamp">LAMP</label>
+                  <input
+                    name="stack"
+                    value="lamp"
+                    id="pt-lamp"
+                    type="checkbox"
+                  />
+                </div>
+                <div class="input-label-container-check">
+                  <label htmlFor="pt-net">.NET</label>
+                  <input
+                    name="stack"
+                    value="net"
+                    id="pt-net"
+                    type="checkbox"
+                  ></input>
+                </div>
+                <div class="input-label-container-check">
+                  <label htmlFor="pt-ruby">Ruby on Rails</label>
+                  <input
+                    name="stack"
+                    value="ruby"
+                    id="pt-ruby"
+                    type="checkbox"
+                  />
+                </div>
+              </div>
+            </section>
           </div>
 
-          <label>Stack</label>
-          <div onChange={this.handleInput}>
-            <label htmlFor="pt-mean">MEAN</label>
-            <input name="stack" value="mean" id="pt-mean" type="checkbox" />
-            <label htmlFor="pt-mern">MERN</label>
-            <input name="stack" value="mern" id="pt-mern" type="checkbox" />
-            <label htmlFor="pt-python">Python Django</label>
-            <input name="stack" value="python" id="pt-python" type="checkbox" />
-            <label htmlFor="pt-lamp">LAMP</label>
-            <input name="stack" value="lamp" id="pt-lamp" type="checkbox" />
-            <label htmlFor="pt-net">.NET</label>
-            <input name="stack" value="net" id="pt-net" type="checkbox"></input>
-            <label htmlFor="pt-ruby">Ruby on Rails</label>
-            <input name="stack" value="ruby" id="pt-ruby" type="checkbox" />
-          </div>
+          <section class="ptr-section flex-container flex-dir-v">
+            <h1>Team Preference</h1>
+            <div class="flex-container fullPwidth">
+              {/* wtf why is this NaN at the beginning  */}
+              <div class="flex-container ptr-preferred-section flex-dir-v">
+                <h5>Preferred team size</h5>
+                <input
+                  type="number"
+                  max={parseInt(this.props.maxTeamSize) - 1}
+                  min="0"
+                  onChange={this.handleInput}
+                  name="size"
+                  placeholder="1"
+                  required
+                />
+              </div>
 
-          {/* wtf why is this NaN at the beginning  */}
-          <input
-            type="number"
-            max={parseInt(this.props.maxTeamSize) - 1}
-            min="0"
-            onChange={this.handleInput}
-            name="size"
-            placeholder="1"
-            required
-          />
-
-          <label>Looking for teammates for these roles</label>
-          <div onChange={this.handleInput}>
-            <label htmlFor="roleAssoc-design">Design</label>
-            <input
-              name="roleAssoc"
-              value="design"
-              id="roleAssoc-design"
-              type="checkbox"
-            />
-            <label htmlFor="roleAssoc-frontend">Frontend</label>
-            <input
-              name="roleAssoc"
-              value="frontend"
-              id="roleAssoc-frontend"
-              type="checkbox"
-            />
-            <label htmlFor="roleAssoc-backend">Backend</label>
-            <input
-              name="roleAssoc"
-              value="backend"
-              id="roleAssoc-backend"
-              type="checkbox"
-            />
-          </div>
+              <div class="flex-container ptr-preferred-section flex-dir-v">
+                <h5>Looking for teammates for these roles</h5>
+                <div class="flex-container" onChange={this.handleInput}>
+                  <div class="input-label-container-check">
+                    <label htmlFor="roleAssoc-design">Design</label>
+                    <input
+                      name="roleAssoc"
+                      value="design"
+                      id="roleAssoc-design"
+                      type="checkbox"
+                    />
+                  </div>
+                  <div class="input-label-container-check">
+                    <label htmlFor="roleAssoc-frontend">Frontend</label>
+                    <input
+                      name="roleAssoc"
+                      value="frontend"
+                      id="roleAssoc-frontend"
+                      type="checkbox"
+                    />
+                  </div>
+                  <div class="input-label-container-check">
+                    <label htmlFor="roleAssoc-backend">Backend</label>
+                    <input
+                      name="roleAssoc"
+                      value="backend"
+                      id="roleAssoc-backend"
+                      type="checkbox"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
           <button type="submit">signup</button>
         </form>
-      </section>
+      </>
     );
   }
 }

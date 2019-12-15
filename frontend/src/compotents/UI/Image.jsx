@@ -9,6 +9,6 @@ export default props => (
     >
       <FiXCircle />
     </div>
-    <img src={props.image.secure_url} alt="" />
+    <img src={props.image.secure_url} class="caq-img-preview" alt="" />
   </div>
 );

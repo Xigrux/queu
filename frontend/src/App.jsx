@@ -44,7 +44,7 @@ class app extends Component {
             </Route>
           </div>
         </BrowserRouter>
-        <Footer></Footer>
+        {/* <Footer></Footer> */}
       </>
     );
   }

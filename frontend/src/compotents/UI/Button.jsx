@@ -1,19 +1,18 @@
 import React from "react";
 import { FiImage } from "react-icons/fi";
+import "../../styles/caq.css";
 
 export default props => (
-  <div className="buttons fadein">
-    <div className="button">
-      <label htmlFor="single">
-        <FiImage />
-      </label>
-      <input
-        type="file"
-        name="image"
-        id="single"
-        onChange={props.onChange}
-        hidden
-      />
-    </div>
-  </div>
+  <>
+    <label htmlFor="single" class="caq-image-picker">
+      <FiImage />
+    </label>
+    <input
+      type="file"
+      name="image"
+      id="single"
+      onChange={props.onChange}
+      hidden
+    />
+  </>
 );

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
+import "../styles/update.css";
 
 class updateCreds extends Component {
   constructor(props) {
@@ -45,21 +46,37 @@ class updateCreds extends Component {
   render() {
     return (
       <section>
-        <form onSubmit={this.updateCreds}>
-          <input
-            onChange={this.handleInput}
-            type="text"
-            name="newEmail"
-            placeholder="newEmail"
-            value={this.state.newEmail === undefined ? "" : this.state.newEmail}
-          ></input>
-          <input
-            onChange={this.handleInput}
-            type="text"
-            name="newPassword"
-            placeholder="newPassword"
-          ></input>
-          <button type="submit">Update</button>
+        <h1>Update your crendentials</h1>
+        <form
+          class="flex-container flex-center-v update-form"
+          onSubmit={this.updateCreds}
+        >
+          <div class="input-label-container">
+            <input
+              onChange={this.handleInput}
+              type="text"
+              name="newEmail"
+              placeholder=" "
+              value={
+                this.state.newEmail === undefined ? "" : this.state.newEmail
+              }
+              id="update-email"
+            ></input>
+            <label for="update-emai">New Email</label>
+          </div>
+          <div class="input-label-container">
+            <input
+              onChange={this.handleInput}
+              type="text"
+              name="newPassword"
+              placeholder=" "
+              id="update-password"
+            ></input>
+            <label for="update-password">New Password</label>
+          </div>
+          <button class="update-submit" type="submit">
+            Update
+          </button>
         </form>
       </section>
     );
