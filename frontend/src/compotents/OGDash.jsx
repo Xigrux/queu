@@ -44,7 +44,7 @@ class ogdash extends Component {
           teamed up into {this.props.nbTeams}{" "}
           {this.props.nbTeams > 1 ? "teams" : "team"}
         </div>
-        <button onClick={this.makeTeam}>Quen in teams</button>
+        <button onClick={this.makeTeam}>Queu in teams</button>
       </section>
     );
   }

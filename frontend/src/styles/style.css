@@ -31,6 +31,12 @@ a {
   color: var(--font-color);
 }
 
+h4,
+h5,
+h6 {
+  margin-bottom: 10px;
+}
+
 #root,
 .fullVwidth {
   width: 100vw;
@@ -166,6 +172,10 @@ input {
   margin: 12px 0;
 }
 
+.input-label-container-check input {
+  display: none;
+}
+
 label {
   transition: 200ms ease all;
   position: absolute;
@@ -179,8 +189,10 @@ input:hover {
   color: #333;
 }
 
-input:focus + label,
-input:not(:placeholder-shown) + label {
+input[type="text"]:focus + label,
+input[type="text"]:not(:placeholder-shown) + label,
+input[type="number"]:focus + label,
+input[type="number"]:not(:placeholder-shown) + label {
   margin-top: -35px;
   transform-origin: left;
   transform: scale(0.7);
@@ -189,6 +201,10 @@ input:not(:placeholder-shown) + label {
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   opacity: 1;
+}
+
+input[type="checkbox"]:checked + label {
+  color: red !important;
 }
 
 section {

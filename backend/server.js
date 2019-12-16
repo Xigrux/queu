@@ -233,15 +233,15 @@ app.post("/register", upload.none(), (req, res) => {
           } else {
             // send email
             var mailOptions = {
-              from: '"Example Team" <from@example.com>',
+              from: '"Queu Team" <from@example.com>',
               to: email,
-              subject: "Nice Nodemailer test",
+              subject: "You registered for Queu",
               // text:
               //   "Hey , it’s our first message sent with Nodemailer ",
               html:
                 "<b>Hey " +
                 username +
-                " </b><br> This is our first message sent with Nodemailer<br />"
+                " </b><br> thanks for registration with Queu, check back soon for your team inviation email.<br />"
               // <img src="cid:uniq-mailtrap.png" alt="mailtrap" />
               // attachments: [
               //   {
@@ -314,6 +314,33 @@ app.post("/create-a-queu", upload.none(), (req, res) => {
       );
 
       console.log("Successfully created new user:", userRecord.uid);
+
+      // send email
+      var mailOptions = {
+        from: '"Queu Team" <from@example.com>',
+        to: email,
+        subject: "You registered for Queu",
+        // text:
+        //   "Hey , it’s our first message sent with Nodemailer ",
+        html:
+          "<b>Hey " +
+          event +
+          " </b><br> thanks for creating your Queu, access you portal and let the team making start.<br />"
+        // <img src="cid:uniq-mailtrap.png" alt="mailtrap" />
+        // attachments: [
+        //   {
+        //     filename: "mailtrap.png",
+        //     path: __dirname + "/mailtrap.png",
+        //     cid: "uniq-mailtrap.png"
+        //   }
+        // ]
+      };
+      transport.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          return console.log(error);
+        }
+        console.log("Message sent: %s", info.messageId);
+      });
     })
     .catch(function(error) {
       console.log("Error creating new user:", error);

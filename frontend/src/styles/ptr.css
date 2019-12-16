@@ -2,8 +2,12 @@
   padding: 0;
   margin: 3vw;
   width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 0 5px #00000033;
+  padding: 5vw;
 }
 
 .ptr-preferred-section {
   width: 100%;
+  margin: 2vw;
 }
